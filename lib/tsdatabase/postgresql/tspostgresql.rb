@@ -116,10 +116,8 @@ module TSDatabase
     #\return boolean exception is false or exception if failed and exception is true
     def create hash, exception = true
       begin
-       
-        
         #TODO
-        
+        raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
           raise e
@@ -134,7 +132,7 @@ module TSDatabase
     def update hash, exception = true
       begin
         #TODO
-        
+        raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
           raise e
@@ -149,7 +147,7 @@ module TSDatabase
       unless is_by_id?(record_id); if exception; raise RecordIdError  else false end end
       begin
         #TODO
-        
+        raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
           raise e
