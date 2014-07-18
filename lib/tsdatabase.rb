@@ -32,7 +32,7 @@ module TSDatabase
       def set_mode(mode);@@mode = mode; end
     end
     
-    @@mode = TSDatabase::DEFAULT
+    @@mode = DEFAULT
     @@database_default = nil
     
     def initialize
@@ -59,7 +59,7 @@ module TSDatabase
       unless (connections.nil?)
         Thread.current[:tsclientdb][database] = nil
         
-        if (@@mode==TSDatabase::DEFAULT)
+        if (@@mode==DEFAULT)
           connections.disconnect
         end
       
@@ -76,7 +76,7 @@ module TSDatabase
       connections = Thread.current[:tsclientdb]
       unless (connections.nil?)
         connections.each do |key, value|
-          if (@@mode==TSDatabase::DEFAULT)
+          if (@@mode==DEFAULT)
             value.disconnect
           end
           @clients[key].push value
@@ -138,7 +138,7 @@ module TSDatabase
         raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"
       end
       
-      if (@@mode == TSDatabase::PRELOADED)
+      if (@@mode == PRELOADED)
         clt.connect
       end
       
