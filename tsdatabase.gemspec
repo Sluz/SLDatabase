@@ -5,7 +5,7 @@ require 'tsdatabase/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "tsdatabase"
-  spec.version       = Tsdatabase::VERSION
+  spec.version       = TSDatabase::VERSION
   spec.authors       = ["Cyril"]
   spec.email         = ["cyril@tapastreet.com"]
   spec.summary       = %q{Database Manager\n Required: Postgresql:\n- pg, platform: ruby\n- pg_jruby, platform: ruby\n- orientdb4r, platform: ruby\n- oriendb, platform: jruby\n}
