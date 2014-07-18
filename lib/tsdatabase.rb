@@ -25,6 +25,10 @@ module TSDatabase
       
       def instance;  @@my_instance ||= self.new; end
       
+      def default; 0; end
+      def preloaded; 100; end
+      def keep_loaded; 200; end
+      
       # \param mode could be
       # => :DEFAULT : disconnect client on push 
       # => :PRELOADED : don't disconnect client on push and connect on initialisation \see :config_json or :config_yml
@@ -193,10 +197,11 @@ module TSDatabase
     end
   end
 
-  def instance; TSDatabase.instance; end
-  def default; 0; end
-  def preloaded; 100; end
-  def keep_loaded; 200; end
+  def instance;    TSDatabase::TSDatabase.instance;    end
+  def default;     TSDatabase::TSDatabase.default;     end
+  def preloaded;   TSDatabase::TSDatabase.preloaded;   end
+  def keep_loaded; TSDatabase::TSDatabase.keep_loaded; end
+  
   alias_method :db, :instance
   alias_method :default, :DEFAULT
   alias_method :preloaded, :PRELOADED
