@@ -197,13 +197,15 @@ module TSDatabase
     end
   end
 
-  def instance;    TSDatabase::TSDatabase.instance;    end
-  def default;     TSDatabase::TSDatabase.default;     end
-  def preloaded;   TSDatabase::TSDatabase.preloaded;   end
-  def keep_loaded; TSDatabase::TSDatabase.keep_loaded; end
-  
-  alias_method :db, :instance
-  alias_method :DEFAULT, :default
-  alias_method :PRELOADED, :preloaded
-  alias_method :KEEP_LOADED, :keep_loaded 
+  def TSDatabase.instance;    TSDatabase::TSDatabase.instance;    end
+  def TSDatabase.default;     TSDatabase::TSDatabase.default;     end
+  def TSDatabase.preloaded;   TSDatabase::TSDatabase.preloaded;   end
+  def TSDatabase.keep_loaded; TSDatabase::TSDatabase.keep_loaded; end
+
+  class << self # or, class << MyModule
+    alias :db :instance
+    alias :DEFAULT :default
+    alias :PRELOADED :preloaded
+    alias :KEEP_LOADED :keep_loaded 
+  end
 end
