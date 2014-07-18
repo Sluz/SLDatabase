@@ -203,7 +203,7 @@ module TSDatabase
   def keep_loaded; TSDatabase::TSDatabase.keep_loaded; end
   
   alias_method :db, :instance
-  alias_method :default, :DEFAULT
-  alias_method :preloaded, :PRELOADED
-  alias_method :keep_loaded, :KEEP_LOADED
+  alias_method :DEFAULT, :default
+  alias_method :PRELOADED, :preloaded
+  alias_method :KEEP_LOADED, :keep_loaded 
 end
