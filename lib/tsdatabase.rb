@@ -125,18 +125,18 @@ module TSDatabase
       when :postgresql
         if (RUBY_PLATFORM === "java")
           require 'tsdatabase/postgresql/jtspostgresql'
-          clt = TSCore::JTSPostgresql.new config
+          clt = TSDatabse::JTSPostgresql.new config
         else
           require 'tsdatabase/postgresql/tspostgresql'
-          clt = TSCore::TSPostgresql.new config
+          clt = TSDatabse::TSPostgresql.new config
         end
       when :orientdb
         if (RUBY_PLATFORM === "java")
           require 'tsdatabase/orientdb/jtsorientdb'
-          clt = TSCore::JTSOrientdb.new config
+          clt = TSDatabse::JTSOrientdb.new config
         else
           require 'tsdatabase/orientdb/tsorientdb'
-          clt = TSCore::TSOrientdb.new config
+          clt = TSDatabse::TSOrientdb.new config
         end
       else
         raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"

@@ -2,7 +2,7 @@
 #  All right reserved 
 #
 
-require 'activerecord-jdbcpostgresql-adapter'
+#require 'activerecord-jdbcpostgresql-adapter'
 require 'tsdatabase/tsclientdb'
 
 #
