@@ -23,6 +23,8 @@ module TSDatabase
       class ConfigurationError < TSDatabaseError; end
       class MissingAdapterError < TSDatabaseError; end
       
+      attr_reader :database_default
+      
       def instance;  @@my_instance ||= self.new; end
       
       def default; 0; end
