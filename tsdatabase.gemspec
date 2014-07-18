@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = Tsdatabase::VERSION
   spec.authors       = ["Cyril"]
   spec.email         = ["cyril@tapastreet.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Database Manager\n Required: Postgresql:\n- pg, platform: ruby\n- pg_jruby, platform: ruby\n- orientdb4r, platform: ruby\n- oriendb, platform: jruby\n}
+  spec.description   = %q{Database Manager}
   spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.license       = "Tapastreet ltd Copyright © All Rights Reserved"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
+  spec.add_dependency "multi_json", ">= 1"
 end
