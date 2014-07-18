@@ -2,7 +2,7 @@
 #  All right reserved 
 #
 
-require 'pg'
+require 'pg' unless defined?( PG )
 require 'tsdatabase/tsclientdb'
 
 #

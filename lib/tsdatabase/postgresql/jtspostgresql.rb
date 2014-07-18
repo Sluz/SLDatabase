@@ -2,14 +2,14 @@
 #  All right reserved 
 #
 
-#require 'activerecord-jdbcpostgresql-adapter'
-require 'tsdatabase/tsclientdb'
+require 'pg_jruby'
+require 'tsdatabase/tsposgresql'
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
 module TSDatabase
-  class JTSPostgresql < TSClientdb
+  class JTSPostgresql < TSPostgresql
     def initialize option={}
       @dbconfig = {
         :username => option["username"],
