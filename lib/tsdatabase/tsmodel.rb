@@ -112,7 +112,7 @@ module TSDatabase
     
     def save 
       error = nil
-      hash_validates.each do |key, value|
+      self.hash_validates.each do |key, value|
         e = value.call(key, datas)
         unless e.nil?
           # checking whether e is a boolean
