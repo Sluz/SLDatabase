@@ -108,7 +108,7 @@ module TSDatabase
       end
     end
     
-    def query_block database=self.database,  &block
+    def self.query_block database=self.database,  &block
       begin
         is_from_thread = true
         conn = Thread.current[:tsclientdb][database]
