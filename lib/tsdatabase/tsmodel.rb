@@ -15,15 +15,16 @@ module TSDatabase
   class TSModel
     @@validates = {}
     @@links = {}
-   
+    @@database = TSManager.default
+    
     class << self
 
       def database
-        @database ||= TSManager.default
+        @@database
       end
       
       def database= name
-        @database = name 
+        @@database = name 
       end
       
       def create record_datas
@@ -108,7 +109,7 @@ module TSDatabase
       end
     end
     
-    def self.query_block database=self.database,  &block
+    def self.query_block database=self.database, &block
       begin
         is_from_thread = true
         conn = Thread.current[:tsclientdb][database]
