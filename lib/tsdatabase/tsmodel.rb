@@ -77,7 +77,7 @@ module TSDatabase
       query_block do |conn|
         array = conn.find_by_query(query, *option)
         array.each_index  do |i|
-          array[i] = self.class.new(array[i])
+          array[i] = self.new(array[i])
         end
         array
       end
@@ -85,9 +85,9 @@ module TSDatabase
     
     def self.find_by_hash(hash)
       query_block do |conn|
-        array = conn.find_by_hash(hash, "#{self.class.name.downcase}")
+        array = conn.find_by_hash(hash, "#{self.name.downcase}")
         array.each_index  do |i|
-          array[i] = self.class.new(array[i])
+          array[i] = self.new(array[i])
         end
         array
       end
@@ -97,7 +97,7 @@ module TSDatabase
       query_block do |conn|
         array = conn.find_by_id(record_id)
         array.each_index  do |i|
-          array[i] = self.class.new(array[i])
+          array[i] = self.new(array[i])
         end
         array
       end
