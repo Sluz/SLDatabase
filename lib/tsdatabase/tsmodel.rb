@@ -13,18 +13,27 @@ module TSDatabase
   class InvalidError< TSDatabaseError; end
   
   class TSModel
-    @@validates = {}
-    @@links = {}
-    @@database = TSManager.database_default
+    
     
     class << self
+      @validates  = {}
+      @links = {}
+      @database = TSManager.database_default
+      
+      def hash_validates
+        @validates
+      end
+      
+      def hash_links
+        @links
+      end
 
       def database
-        @@database
+        @database
       end
       
       def database= name
-        @@database = name 
+        @database = name 
       end
       
       def create record_datas
@@ -106,7 +115,7 @@ module TSDatabase
     
     def save 
       error = nil
-      @@validates.each do |key, value|
+      hash_validates.each do |key, value|
         e = value.call(key, datas)
         unless e.nil?
           # checking whether e is a boolean
@@ -186,7 +195,7 @@ module TSDatabase
     end
     
     def self.expand key
-      info = @@links[key]
+      info = hash_links[key]
       unless info.nil?
         db = info[:database]
         if (db.nil?)
@@ -194,9 +203,9 @@ module TSDatabase
         end
         query_block db do |conn|
           if (info[:table].nil?)
-            @@links[key][:expand] = conn.find_by_id(datas[key])
+            hash_links[key][:expand] = conn.find_by_id(datas[key])
           else
-            @@links[key][:expand] = conn.find_by_id(datas[key], info[:table])
+            hash_links[key][:expand] = conn.find_by_id(datas[key], info[:table])
           end
         end
       else
@@ -226,11 +235,11 @@ module TSDatabase
         raise InvalidError, "It's not a String or Hash"
       end
       
-      @@links[key] = option.merge rfrom
+      hash_links[key] = option.merge rfrom
     end
     
     def self.validates key, &block
-      @@validates[key] = block
+      hash_validates[key] = block
     end
     
     def method_missing(method_name, *args, &block)
