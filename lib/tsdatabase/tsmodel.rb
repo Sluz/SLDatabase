@@ -13,10 +13,7 @@ module TSDatabase
   class InvalidError< TSDatabaseError; end
   
   class TSModel
-    
-    
     class << self
-      
       def hash_validates
         @validates ||={}
       end
@@ -112,7 +109,7 @@ module TSDatabase
     
     def save 
       error = nil
-      self.hash_validates.each do |key, value|
+      self.class.hash_validates.each do |key, value|
         e = value.call(key, datas)
         unless e.nil?
           # checking whether e is a boolean
