@@ -165,7 +165,7 @@ module TSDatabase
       #Duplicate record
       if exception.message["com.orientechnologies.orient.core.storage.ORecordDuplicatedException"].nil? == false
         except = RecordDuplicateError.new  e.message
-        except.set_backtrace(e.backtrace)
+        except.set_backtrace(exception.backtrace)
         
         #IO Database Connection
       elsif exception.message["com.orientechnologies.common.io.OIOException"].nil? == false
