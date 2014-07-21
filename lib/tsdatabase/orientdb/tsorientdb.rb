@@ -83,8 +83,9 @@ module TSDatabase
           from = option[0]
         end
       end
-
-      @db.query("select from #{from} where #{where}")
+      
+      puts "select * from #{from} where #{where}"
+      @db.query("select * from #{from} where #{where}")
 
     end
 
