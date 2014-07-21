@@ -15,7 +15,7 @@ module TSDatabase
   class TSModel
     @@validates = {}
     @@links = {}
-    @@database = TSManager.default
+    @@database = TSManager.database_default
     
     class << self
 
