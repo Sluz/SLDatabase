@@ -154,7 +154,9 @@ module TSDatabase
     end
 
     def disconnect
-      @db.disconnect
+      unless @db.nil?
+        @db.close
+      end
     end
     
     def parse_exception exception
