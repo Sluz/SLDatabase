@@ -49,9 +49,9 @@ module TSDatabase
     end
     
     def find_by_hash(hash)
-       query_block do |conn|
-         conn.find_by_hash(hash, "#{self.class.downcase}")
-        end
+      query_block do |conn|
+        conn.find_by_hash(hash, "#{self.class.downcase}")
+      end
     end
     
     def find_by_id(record_id)
@@ -173,37 +173,35 @@ module TSDatabase
     end
     
     def method_missing(method_name, *args, &block)
-        if method_name.to_s =~ /^find_by_(.+)$/
-          run_find_by_method($1, *args, &block)
-        elsif (method_name.to_s =~ /^(.+)$=\z/)
-          datas[$1] = args[0]
+      if method_name.to_s =~ /^find_by_(.+)$/
+        run_find_by_method($1, *args, &block)
+      elsif (method_name.to_s =~ /^(.+)=\z$/)
+        datas[$1] = args[0]
+      else
+        r = datas[method_name.to_s]
+        unless r.nil?
+          r
         else
-          r = datas[method_name.to_s]
-          unless r.nil?
-            r
-          else
-            super
-          end
+          super
         end
+      end
     end
     
-     def run_find_by_method(attrs, *args, &block)
-        # Make an array of attribute names
-        attrs = attrs.split('_and_')
+    def run_find_by_method(attrs, *args, &block)
+      # Make an array of attribute names
+      attrs = attrs.split('_and_')
 
-        # #transpose will zip the two arrays together like so:
-        #   [[:a, :b, :c], [1, 2, 3]].transpose
-        #   # => [[:a, 1], [:b, 2], [:c, 3]]
-        attrs_with_args = [attrs, args].transpose
+      # #transpose will zip the two arrays together like so:
+      #   [[:a, :b, :c], [1, 2, 3]].transpose
+      #   # => [[:a, 1], [:b, 2], [:c, 3]]
+      attrs_with_args = [attrs, args].transpose
 
-        # Hash[] will take the passed associative array and turn it
-        # into a hash like so:
-        #   Hash[[[:a, 2], [:b, 4]]] # => { :a => 2, :b => 4 }
-        conditions = Hash[attrs_with_args]
+      # Hash[] will take the passed associative array and turn it
+      # into a hash like so:
+      #   Hash[[[:a, 2], [:b, 4]]] # => { :a => 2, :b => 4 }
+      conditions = Hash[attrs_with_args]
         
-        find_by_hash conditions
-      end
-    
-    
+      find_by_hash conditions
+    end
   end
 end
