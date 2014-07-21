@@ -155,7 +155,7 @@ module TSDatabase
 
     def disconnect
       unless @db.nil?
-        @db.close
+        @db.disconnect
       end
     end
     
