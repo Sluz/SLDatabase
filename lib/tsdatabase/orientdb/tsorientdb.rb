@@ -144,7 +144,11 @@ module TSDatabase
     
     def connect
       unless connected?
-        @db.connect(@dbconfig)
+        begin
+          @db.connect(@dbconfig)
+        rescue =>e
+          raise parse_exception  e
+        end
       end
     end
     
@@ -167,12 +171,12 @@ module TSDatabase
         except = TSDatabase::RecordDuplicateError.new  e.message
         except.set_backtrace(exception.backtrace)
         
-        #IO Database Connection
+      #IO Database Connection
       elsif exception.message["com.orientechnologies.common.io.OIOException"].nil? == false
         except = TSDatabase::ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
-        #default
+      #default
       else 
         except = super exception
       end

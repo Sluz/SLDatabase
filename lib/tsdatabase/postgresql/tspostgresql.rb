@@ -120,7 +120,7 @@ module TSDatabase
         raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -135,7 +135,7 @@ module TSDatabase
         raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -150,7 +150,7 @@ module TSDatabase
         raise NotImplementedError, 'NotImplementedError To Do'
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -159,13 +159,17 @@ module TSDatabase
     
     def connect
       unless (connected?)
-        @db = PG.connect @dbconfig
+        begin
+          @db = PG.connect @dbconfig 
+        rescue =>e
+          raise parse_exception  e
+        end
       end
     end
     
     #\return true if connection is alive
     def connected?
-       !@db.finished?
+      !@db.finished?
     end
 
     def disconnect
@@ -174,7 +178,7 @@ module TSDatabase
       end
     end
     
-     def parse_exception exception
+    def parse_exception exception
       except = nil
       
       #Duplicate record
@@ -187,7 +191,7 @@ module TSDatabase
         except = TSDatabase::ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
-        #default
+      #default
       else 
         except = super exception
       end
