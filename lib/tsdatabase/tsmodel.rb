@@ -29,8 +29,8 @@ module TSDatabase
       end
     end
     
-    attr_accessors :datas
-
+    attr_accessor :datas
+    
     def initialize record_datas
       if (record_datas.is_a? Hash)
         datas = record_datas
