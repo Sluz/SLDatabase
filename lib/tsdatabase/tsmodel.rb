@@ -43,21 +43,33 @@ module TSDatabase
       end
     end
     
-    def find(query, *option)
+    def self.find(query, *option)
       query_block do |conn|
-        conn.find_by_query(query, *option)
+        array = conn.find_by_query(query, *option)
+        array.each_index  do |i|
+          array[i] = self.class.new(array[i])
+        end
+        array
       end
     end
     
-    def find_by_hash(hash)
+    def self.find_by_hash(hash)
       query_block do |conn|
-        conn.find_by_hash(hash, "#{self.class.downcase}")
+        array = conn.find_by_hash(hash, "#{self.class.downcase}")
+        array.each_index  do |i|
+          array[i] = self.class.new(array[i])
+        end
+        array
       end
     end
     
-    def find_by_id(record_id)
+    def self.find_by_id(record_id)
       query_block do |conn|
-        conn.find_by_id(record_id)
+        array = conn.find_by_id(record_id)
+         array.each_index  do |i|
+          array[i] = self.class.new(array[i])
+        end
+        array
       end
     end
     
@@ -175,7 +187,7 @@ module TSDatabase
     
     def method_missing(method_name, *args, &block)
       if method_name.to_s =~ /^find_by_(.+)$/
-        run_find_by_method($1, *args, &block)
+        find_by($1, *args, &block)
       elsif (method_name.to_s =~ /^(.+)=\z$/)
         datas[$1] = args[0]
       else
@@ -188,7 +200,7 @@ module TSDatabase
       end
     end
     
-    def run_find_by_method(attrs, *args, &block)
+    def find_by(attrs, *args, &block)
       # Make an array of attribute names
       attrs = attrs.split('_and_')
 
@@ -202,7 +214,12 @@ module TSDatabase
       #   Hash[[[:a, 2], [:b, 4]]] # => { :a => 2, :b => 4 }
       conditions = Hash[attrs_with_args]
         
-      find_by_hash conditions
+      r = find_by_hash conditions
+      if r.empty?
+        nil
+      else
+        r[0]
+      end
     end
   end
 end
