@@ -12,6 +12,7 @@ module TSDatabase
       class RecordIdError < TSDatabaseError; end
       class RecordDuplicateError < TSDatabaseError; end
       class QueryError < TSDatabaseError; end
+      class ConnectionError < TSDatabaseError; end
     end 
     
     attr_reader :db

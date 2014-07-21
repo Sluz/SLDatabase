@@ -17,10 +17,9 @@ require 'thread'
 module TSDatabase
   
   class TSDatabaseError < StandardError; end
-
+  
   class TSDatabase
     class << self
-      class ConnectionError < TSDatabaseError; end
       class ConfigurationError < TSDatabaseError; end
       class MissingAdapterError < TSDatabaseError; end
       
