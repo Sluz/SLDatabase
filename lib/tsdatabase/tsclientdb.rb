@@ -21,6 +21,10 @@ module TSDatabase
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
+    def parse_id_from hash
+      raise NotImplementedError, 'this should be overridden by concrete client'
+    end
+    
     def find query, *option
       if is_by_hash? query
         find_by_hash query, *option

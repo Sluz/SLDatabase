@@ -37,6 +37,10 @@ module TSDatabase
       @db = Orientdb4r.client @server_config
     end
     
+    def id
+      
+    end
+    
     # \return true if query is a record_id
     def is_by_id? query
       query.is_a?(String) && (query =~ /\A#\d+:\d+\z/)
@@ -161,6 +165,10 @@ module TSDatabase
       unless @db.nil?
         @db.disconnect
       end
+    end
+    
+    def parse_id_from hash
+      hash["@rid"]
     end
     
     def parse_exception exception

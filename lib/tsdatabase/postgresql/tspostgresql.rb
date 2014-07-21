@@ -74,6 +74,10 @@ module TSDatabase
       #[host port options tty dbname user password]
     end
     
+    def parse_id_from hash
+      hash["id"]
+    end
+    
     # \return hash of records or nil
     def find_by_id record_id, *option
       if option.empty() ; raise TSPostgresql::TableError, "No table associate"; end

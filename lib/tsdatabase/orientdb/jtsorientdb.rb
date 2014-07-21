@@ -141,6 +141,10 @@ module TSDatabase
       end
     end
     
+    def parse_id_from hash
+      hash["@rid"]
+    end
+    
     def format_results datas
       result = []
       for record in datas
