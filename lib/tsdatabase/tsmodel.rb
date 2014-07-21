@@ -63,7 +63,8 @@ module TSDatabase
       end
     end
     
-    attr_accessor :datas
+    attr_accessor :datas 
+    attr_accessor :errors
     
     def initialize record_datas
       if (record_datas.is_a? Hash)
@@ -121,10 +122,23 @@ module TSDatabase
         end
       end
       if (error.nil?)
-        #todo save
-        raise NotImplementedError, 'NotImplementedError To Do Save'
+         hash = query_block do |conn|
+           id = conn.parse_id_from datas
+           if (id.nil?)
+             conn.create( datas.merge( {"@class"=>self.class.name.downcase} ) )
+           else
+             conn.update( datas.merge( {"@class"=>self.class.name.downcase} ) )
+           end
+         end
+         unless hash.nil?
+           datas.merge hash
+           self
+         else
+           nil
+         end
       else
-        {:error=>error}
+        self.errors = error
+        nil
       end
     end
     
