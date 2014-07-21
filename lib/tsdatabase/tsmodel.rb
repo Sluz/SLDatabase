@@ -7,13 +7,13 @@
 require "tsdatabase"
 
 module TSDatabase
+  class InvalidError< StrandError; end
+  
   class TSModel
     class << self
-      
-      class InvalidError< StrandError; end
-      
+
       def database
-        @database ||= TSDatabase::TSDatabase.default
+        @database ||= TSManager.default
       end
       
       def database= name
@@ -102,12 +102,12 @@ module TSDatabase
         conn = Thread.current[:tsclientdb][database]
         if (conn.nil?)
           is_from_thread = false
-          conn = TSDatabase.db.pop(database)
+          conn = TSManager.db.pop(database)
         end
         yield(conn)
       ensure
         unless is_from_thread
-          TSDatabase.db.push(database)
+          TSManager.db.push(database)
         end
       end
     end

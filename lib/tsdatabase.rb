@@ -8,25 +8,26 @@ require 'thread'
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 # 
+# Ruby:
 # :postgresql => gem 'pg', platform: :ruby
-# :postgresql => gem 'pg_ruby', platform: :jruby  
-# :orientdb   => gem 'orientdb', platform: :jruby
 # :orientdb   => gem 'orientdb4r', platform: :ruby
+# 
+# JRuby:
+# :postgresql => gem 'jruby_pg', platform: :jruby  
+# :orientdb   => gem 'orientdb', platform: :jruby
 #
 
 module TSDatabase
   
-  class TSDatabaseError < StandardError; end
+  class TSDatabaseError < StandardError; end 
+  class ConfigurationError < TSDatabaseError; end
+  class MissingAdapterError < TSDatabaseError; end
   
-  class TSDatabase
+  class TSManager
     class << self
-      class ConfigurationError < TSDatabaseError; end
-      class MissingAdapterError < TSDatabaseError; end
-      
       attr_reader :database_default
       
       def instance;  @@my_instance ||= self.new; end
-      
       def default; 0; end
       def preloaded; 100; end
       def keep_loaded; 200; end
@@ -36,9 +37,11 @@ module TSDatabase
       # => :PRELOADED : don't disconnect client on push and connect on initialisation \see :config_json or :config_yml
       # => :KEEP_LOADED : don't disconnect client on push    
       def set_mode(mode);@@mode = mode; end
+      
+      alias_method :db, :instance
     end
     
-    @@mode = TSDatabase.default
+    @@mode = TSManager.default
     @@database_default = nil
     
     def initialize
@@ -65,7 +68,7 @@ module TSDatabase
       unless (connections.nil?)
         Thread.current[:tsclientdb][database] = nil
         
-        if (@@mode==TSDatabase.default)
+        if (@@mode==TSManager.default)
           connections.disconnect
         end
       
@@ -82,7 +85,7 @@ module TSDatabase
       connections = Thread.current[:tsclientdb]
       unless (connections.nil?)
         connections.each do |key, value|
-          if (@@mode==TSDatabase.default)
+          if (@@mode==TSManager.default)
             value.disconnect
           end
           @clients[key].push value
@@ -144,7 +147,7 @@ module TSDatabase
         raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"
       end
       
-      if (@@mode == TSDatabase.preloaded)
+      if (@@mode == TSManager.preloaded)
         clt.connect
       end
       
@@ -201,10 +204,10 @@ module TSDatabase
 
   # Module function
   class << self 
-    def instance;    TSDatabase.instance;    end
-    def default;     TSDatabase.default;     end
-    def preloaded;   TSDatabase.preloaded;   end
-    def keep_loaded; TSDatabase.keep_loaded; end
+    def instance;    TSManager.instance;    end
+    def default;     TSManager.default;     end
+    def preloaded;   TSManager.preloaded;   end
+    def keep_loaded; TSManager.keep_loaded; end
     alias_method :db, :instance
     alias_method :DEFAULT, :default
     alias_method :PRELOADED, :preloaded
