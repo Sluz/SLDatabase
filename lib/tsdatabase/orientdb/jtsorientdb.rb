@@ -88,7 +88,7 @@ module TSDatabase
         OrientDB::Document.create @db, class_name, hash
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception  e
         else
           false
         end
@@ -109,7 +109,7 @@ module TSDatabase
         @db.delete(OrientDB::RID.new record_id)
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -118,7 +118,11 @@ module TSDatabase
     
     def connect
       unless (connected?)
-        @db = OrientDB::DocumentDatabase.connect @dbconfig[:url], @dbconfig[:username], @dbconfig[:password]
+        begin
+          @db = OrientDB::DocumentDatabase.connect @dbconfig[:url], @dbconfig[:username], @dbconfig[:password]
+        rescue =>e
+          raise parse_exception  e
+        end
       end
     end
     
@@ -166,7 +170,7 @@ module TSDatabase
     end
     
     def format_hash hash
-       result = {}
+      result = {}
       for key, value in hash
         unless value.nil?
           result[key] = format_value value
@@ -192,6 +196,26 @@ module TSDatabase
       else
         value
       end
+    end
+    
+    def parse_exception exception
+      except = nil
+      #Duplicate record
+      if exception.kind_of?(Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException)
+        except = RecordDuplicateError.new exception.message
+        except.set_backtrace(exception.backtrace) 
+      
+      #IO Database Connection
+      elsif exception.kind_of?(Java::ComOrientechnologiesCommonIo::OIOException)
+        except = ConnectionError.new exception.message
+        except.set_backtrace(exception.backtrace)
+        
+      #default
+      else
+        except = super exception
+      end
+       
+      except
     end
   end
 end

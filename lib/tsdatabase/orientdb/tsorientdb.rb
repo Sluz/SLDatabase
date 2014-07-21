@@ -101,7 +101,7 @@ module TSDatabase
         @db.create_document(hash)
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -117,7 +117,7 @@ module TSDatabase
         @db.update_document(hash)
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -134,7 +134,7 @@ module TSDatabase
         @db.delete_document(record_id)
       rescue => e
         if (exception)
-          raise e
+          raise parse_exception e
         else
           false
         end
@@ -155,6 +155,27 @@ module TSDatabase
 
     def disconnect
       @db.disconnect
+    end
+    
+    def parse_exception exception
+      except = nil
+      
+      #Duplicate record
+      if exception.message["com.orientechnologies.orient.core.storage.ORecordDuplicatedException"].nil? == false
+        except = RecordDuplicateError.new  e.message
+        except.set_backtrace(e.backtrace)
+        
+        #IO Database Connection
+      elsif exception.message["com.orientechnologies.common.io.OIOException"].nil? == false
+        except = ConnectionError.new exception.message
+        except.set_backtrace(exception.backtrace)
+        
+        #default
+      else 
+        except = super exception
+      end
+      
+      except
     end
   end
 end

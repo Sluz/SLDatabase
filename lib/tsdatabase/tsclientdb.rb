@@ -10,6 +10,7 @@ module TSDatabase
     
     class << self
       class RecordIdError < TSDatabaseError; end
+      class RecordDuplicateError < TSDatabaseError; end
       class QueryError < TSDatabaseError; end
     end 
     
@@ -93,6 +94,12 @@ module TSDatabase
 
     def disconnect
       raise NotImplementedError, 'this should be overridden by concrete client'
+    end
+    
+    def parse_exception exception
+      except = TSDatabaseError.new exception.message
+      except.set_backtrace exception.backtrace
+      except
     end
   end
 end

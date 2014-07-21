@@ -20,6 +20,7 @@ module TSDatabase
 
   class TSDatabase
     class << self
+      class ConnectionError < TSDatabaseError; end
       class ConfigurationError < TSDatabaseError; end
       class MissingAdapterError < TSDatabaseError; end
       
