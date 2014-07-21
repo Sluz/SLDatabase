@@ -38,7 +38,7 @@ module TSDatabase
       if (record_datas.is_a? Hash)
         self.datas = record_datas
         self.datas.keys.each do |key|
-          define_method(key.to_s) do
+          self.class.send(:define_method, key.to_s) do
             self.datas[key]
           end
         end
@@ -95,7 +95,7 @@ module TSDatabase
     
     def []= key, value
       unless (datas.key? key)
-        define_method(key.to_s) do
+        self.class.send(:define_method, key.to_s) do
           self.datas[key]
         end
       end
