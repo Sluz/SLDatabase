@@ -173,6 +173,27 @@ module TSDatabase
         @db.close
       end
     end
+    
+     def parse_exception exception
+      except = nil
+      
+      #Duplicate record
+      if false
+        except = TSDatabase::RecordDuplicateError.new  e.message
+        except.set_backtrace(exception.backtrace)
+        
+      #IO Database Connection
+      elsif  false
+        except = TSDatabase::ConnectionError.new exception.message
+        except.set_backtrace(exception.backtrace)
+        
+        #default
+      else 
+        except = super exception
+      end
+      
+      except
+    end
 
   end
 end
