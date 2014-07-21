@@ -32,10 +32,18 @@ module TSDatabase
     attr_accessor :datas
     
     def initialize record_datas
+      unless defined? @@validates && @@validates.nil? == false
+        @@validates = {}
+      end
+      
+      unless defined? @@links && @@links.nil? == false
+        @@links = {}
+      end
+      
       if (record_datas.is_a? Hash)
-        datas = record_datas
+        self.datas = record_datas
       else
-        nil
+        nila
       end
     end
     
@@ -53,7 +61,7 @@ module TSDatabase
     
     def save 
       error = nil
-      @validates.each do |key, value|
+      @@validates.each do |key, value|
           e = value[0].call(datas[key])
           unless e.nil?
             # checking whether e is a boolean
@@ -115,8 +123,8 @@ module TSDatabase
       end
     end
     
-    def expand key
-       info = @links[key]
+    def self.expand key
+       info = @@links[key]
        unless info.nil?
           db = info[:database]
           if (db.nil?)
@@ -124,9 +132,9 @@ module TSDatabase
           end
           query_block db do |conn|
               if (info[:table].nil?)
-                @links[key][:expand] = conn.find_by_id(datas[key])
+                @@links[key][:expand] = conn.find_by_id(datas[key])
               else
-                @links[key][:expand] = conn.find_by_id(datas[key], info[:table])
+                @@links[key][:expand] = conn.find_by_id(datas[key], info[:table])
               end
           end
        else
@@ -134,9 +142,9 @@ module TSDatabase
        end
     end
     
-    def has_link key, from, option ={}
-      unless defined? @links && @links.nil? == false
-        @links = {}
+    def self.has_link key, from, option ={}
+      unless defined? @@links && @@links.nil? == false
+        @@links = {}
       end 
       
       if from.is_a? String
@@ -159,15 +167,15 @@ module TSDatabase
         raise InvalidError, "It's not a String or Hash"
       end
       
-      @links[key] = option.merge rfrom
+      @@links[key] = option.merge rfrom
     end
     
-    def validates key, &block
-      unless defined? @validates && @validates.nil? == false
-        @validates = {}
+    def self.validates key, &block
+      unless defined? @@validates && @@validates.nil? == false
+        @@validates = {}
       end
       
-      @validates[key] = [block, [*error]]
+      @@validates[key] = [block, [*error]]
     end
   end
 end
