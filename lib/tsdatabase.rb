@@ -24,8 +24,12 @@ module TSDatabase
   class MissingAdapterError < TSDatabaseError; end
   
   class TSManager
+    
+    @@mode = TSManager.default
+    @@database_default = nil
+    
     class << self
-      attr_reader :database_default
+      def database_default; @@database_default; end
       
       def instance;  @@my_instance ||= self.new; end
       def default; 0; end
@@ -40,9 +44,6 @@ module TSDatabase
       
       alias_method :db, :instance
     end
-    
-    @@mode = TSManager.default
-    @@database_default = nil
     
     def initialize
       @clients = {}
