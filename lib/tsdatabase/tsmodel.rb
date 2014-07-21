@@ -16,20 +16,17 @@ module TSDatabase
     
     
     class << self
-      @validates  = {}
-      @links = {}
-      @database = TSManager.database_default
       
       def hash_validates
-        @validates
+        @validates ||={}
       end
       
       def hash_links
-        @links
+        @links ||={}
       end
 
       def database
-        @database
+        @database ||= TSManager.database_default
       end
       
       def database= name
