@@ -125,7 +125,7 @@ module TSDatabase
         end
       end
       if (error.nil?)
-         hash = self.query_block do |conn|
+         hash = self.class.query_block do |conn|
            id = conn.parse_id_from datas
            if (id.nil?)
              conn.create( datas.merge( {"@class"=>self.class.name.downcase} ) )
