@@ -5,9 +5,12 @@
 #
 
 require "tsdatabase"
-
+#
+# TODO 
+# - Thinking about dependency destroy like for a user model has_many :user_devices, :dependent => :destroy
+#
 module TSDatabase
-  class InvalidError< StrandError; end
+  class InvalidError< TSDatabaseError; end
   
   class TSModel
     class << self
