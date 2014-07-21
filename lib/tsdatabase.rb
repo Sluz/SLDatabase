@@ -66,12 +66,10 @@ module TSDatabase
     def push_connection(database = @@database_default)
       connections = Thread.current[:tsclientdb][database]
       unless (connections.nil?)
-        Thread.current[:tsclientdb][database] = nil
-        
+        Thread.current[:tsclientdb].delete(database)
         if (@@mode==TSManager.default)
           connections.disconnect
         end
-      
         @clients[database].push connections
       end
     end
