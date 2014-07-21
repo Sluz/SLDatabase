@@ -57,7 +57,7 @@ module TSDatabase
     def save 
       error = nil
       @@validates.each do |key, value|
-        e = value[0].call(datas[key])
+        e = value.call(datas[key])
         unless e.nil?
           # checking whether e is a boolean
           if !!e == e 
@@ -163,7 +163,7 @@ module TSDatabase
     end
     
     def self.validates key, &block
-      @@validates[key] = [block, [*error]]
+      @@validates[key] = block
     end
   end
 end
