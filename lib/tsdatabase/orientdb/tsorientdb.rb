@@ -168,17 +168,17 @@ module TSDatabase
       
       #Duplicate record (Java)
       if exception.message["com.orientechnologies.orient.core.storage.ORecordDuplicatedException"].nil? == false
-        except = TSClientdb::RecordDuplicateError.new  e.message
+        except = RecordDuplicateError.new  e.message
         except.set_backtrace(exception.backtrace)
         
       #IO Database Connection (Java)
       elsif exception.message["com.orientechnologies.common.io.OIOException"].nil? == false
-        except = TSClientdb::ConnectionError.new exception.message
+        except = ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
       #IO Database Connection (Ruby)
       elsif exception.message["all nodes failed to communicate with server!"].nil? == false
-        except = TSClientdb::ConnectionError.new exception.message
+        except = ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
       #default

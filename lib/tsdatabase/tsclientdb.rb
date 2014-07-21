@@ -6,14 +6,13 @@
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
 module TSDatabase
+  
+  class RecordIdError < TSDatabaseError; end
+  class RecordDuplicateError < TSDatabaseError; end
+  class QueryError < TSDatabaseError; end
+  class ConnectionError < TSDatabaseError; end
+  
   class TSClientdb
-    
-    class << self
-      class RecordIdError < TSDatabaseError; end
-      class RecordDuplicateError < TSDatabaseError; end
-      class QueryError < TSDatabaseError; end
-      class ConnectionError < TSDatabaseError; end
-    end 
     
     attr_reader :db
     attr_reader :dbconfig

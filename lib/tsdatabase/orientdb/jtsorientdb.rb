@@ -204,12 +204,12 @@ module TSDatabase
       except = nil
       #Duplicate record
       if exception.kind_of?(Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException)
-        except = TSDatabase::RecordDuplicateError.new exception.message
+        except = RecordDuplicateError.new exception.message
         except.set_backtrace(exception.backtrace) 
       
       #IO Database Connection
       elsif exception.kind_of?(Java::ComOrientechnologiesCommonIo::OIOException)
-        except = TSDatabase::ConnectionError.new exception.message
+        except = ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
       #default

@@ -183,12 +183,12 @@ module TSDatabase
       
       #Duplicate record
       if false
-        except = TSClientdb::RecordDuplicateError.new  e.message
+        except = RecordDuplicateError.new  e.message
         except.set_backtrace(exception.backtrace)
         
       #IO Database Connection
       elsif  false
-        except = TSClientdb::ConnectionError.new exception.message
+        except = ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
       #default
