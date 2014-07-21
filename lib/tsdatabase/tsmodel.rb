@@ -13,6 +13,9 @@ module TSDatabase
   class InvalidError< TSDatabaseError; end
   
   class TSModel
+    @@validates = {}
+    @@links = {}
+   
     class << self
 
       def database
@@ -32,14 +35,6 @@ module TSDatabase
     attr_accessor :datas
     
     def initialize record_datas
-      unless defined? @@validates && @@validates.nil? == false
-        @@validates = {}
-      end
-      
-      unless defined? @@links && @@links.nil? == false
-        @@links = {}
-      end
-      
       if (record_datas.is_a? Hash)
         self.datas = record_datas
       else
@@ -49,32 +44,32 @@ module TSDatabase
     
     def find(query, *option)
       query_block do |conn|
-          conn.find_by_query(query, *option)
+        conn.find_by_query(query, *option)
       end
     end
     
     def find_by_id(record_id)
       query_block do |conn|
-          conn.find_by_id(record_id)
+        conn.find_by_id(record_id)
       end
     end
     
     def save 
       error = nil
       @@validates.each do |key, value|
-          e = value[0].call(datas[key])
-          unless e.nil?
-            # checking whether e is a boolean
-            if !!e == e 
-              unless e
-                if (error.nil?); error={};end
-                error[key] = e
-              end
-            else
+        e = value[0].call(datas[key])
+        unless e.nil?
+          # checking whether e is a boolean
+          if !!e == e 
+            unless e
               if (error.nil?); error={};end
               error[key] = e
-            end  
-          end
+            end
+          else
+            if (error.nil?); error={};end
+            error[key] = e
+          end  
+        end
       end
       if (error.nil?)
         #todo save
@@ -124,28 +119,25 @@ module TSDatabase
     end
     
     def self.expand key
-       info = @@links[key]
-       unless info.nil?
-          db = info[:database]
-          if (db.nil?)
-            db = self.database
+      info = @@links[key]
+      unless info.nil?
+        db = info[:database]
+        if (db.nil?)
+          db = self.database
+        end
+        query_block db do |conn|
+          if (info[:table].nil?)
+            @@links[key][:expand] = conn.find_by_id(datas[key])
+          else
+            @@links[key][:expand] = conn.find_by_id(datas[key], info[:table])
           end
-          query_block db do |conn|
-              if (info[:table].nil?)
-                @@links[key][:expand] = conn.find_by_id(datas[key])
-              else
-                @@links[key][:expand] = conn.find_by_id(datas[key], info[:table])
-              end
-          end
-       else
-         datas[key]
-       end
+        end
+      else
+        datas[key]
+      end
     end
     
     def self.has_link key, from, option ={}
-      unless defined? @@links && @@links.nil? == false
-        @@links = {}
-      end 
       
       if from.is_a? String
         rfrom = {:table => from, :database=>self.database }
@@ -171,10 +163,6 @@ module TSDatabase
     end
     
     def self.validates key, &block
-      unless defined? @@validates && @@validates.nil? == false
-        @@validates = {}
-      end
-      
       @@validates[key] = [block, [*error]]
     end
   end
