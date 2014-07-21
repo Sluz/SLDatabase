@@ -37,6 +37,11 @@ module TSDatabase
     def initialize record_datas
       if (record_datas.is_a? Hash)
         self.datas = record_datas
+        self.datas.keys.each do |key|
+          define_method key.to_s do
+            self.datas[key]
+          end
+        end
       else
         nila
       end
@@ -89,6 +94,11 @@ module TSDatabase
     end
     
     def []= key, value
+      unless (datas.key? key)
+        define_method key.to_s do
+          self.datas[key]
+        end
+      end
       datas[key] = value
     end
     
