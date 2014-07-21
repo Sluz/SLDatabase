@@ -31,6 +31,36 @@ module TSDatabase
         obj = self.new record_datas
         obj.save
       end
+      
+      def find_by(attrs, *args, &block)
+        # Make an array of attribute names
+        attrs = attrs.split('_and_')
+
+        # #transpose will zip the two arrays together like so:
+        #   [[:a, :b, :c], [1, 2, 3]].transpose
+        #   # => [[:a, 1], [:b, 2], [:c, 3]]
+        attrs_with_args = [attrs, args].transpose
+         
+        # Hash[] will take the passed associative array and turn it
+        # into a hash like so:
+        #   Hash[[[:a, 2], [:b, 4]]] # => { :a => 2, :b => 4 }
+        conditions = Hash[attrs_with_args]
+         
+        r = find_by_hash conditions
+        if r.empty?
+          nil
+        else
+          r[0]
+        end
+      end
+      
+      def method_missing(method_name, *args, &block)
+        if method_name.to_s =~ /^find_by_(.+)$/
+          find_by($1, *args, &block)
+        else
+          super
+        end
+      end
     end
     
     attr_accessor :datas
@@ -66,7 +96,7 @@ module TSDatabase
     def self.find_by_id(record_id)
       query_block do |conn|
         array = conn.find_by_id(record_id)
-         array.each_index  do |i|
+        array.each_index  do |i|
           array[i] = self.class.new(array[i])
         end
         array
@@ -186,9 +216,7 @@ module TSDatabase
     end
     
     def method_missing(method_name, *args, &block)
-      if method_name.to_s =~ /^find_by_(.+)$/
-        find_by($1, *args, &block)
-      elsif (method_name.to_s =~ /^(.+)=\z$/)
+      if (method_name.to_s =~ /^(.+)=\z$/)
         datas[$1] = args[0]
       else
         r = datas[method_name.to_s]
@@ -197,28 +225,6 @@ module TSDatabase
         else
           super
         end
-      end
-    end
-    
-    def find_by(attrs, *args, &block)
-      # Make an array of attribute names
-      attrs = attrs.split('_and_')
-
-      # #transpose will zip the two arrays together like so:
-      #   [[:a, :b, :c], [1, 2, 3]].transpose
-      #   # => [[:a, 1], [:b, 2], [:c, 3]]
-      attrs_with_args = [attrs, args].transpose
-
-      # Hash[] will take the passed associative array and turn it
-      # into a hash like so:
-      #   Hash[[[:a, 2], [:b, 4]]] # => { :a => 2, :b => 4 }
-      conditions = Hash[attrs_with_args]
-        
-      r = find_by_hash conditions
-      if r.empty?
-        nil
-      else
-        r[0]
       end
     end
   end
