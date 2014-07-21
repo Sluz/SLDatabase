@@ -154,7 +154,11 @@ module TSDatabase
     def self.query_block database=self.database, &block
       begin
         is_from_thread = true
-        conn = Thread.current[:tsclientdb][database]
+        if Thread.current[:tsclientdb].nil?
+          conn = nil
+        else
+          conn = Thread.current[:tsclientdb][database]
+        end
         if (conn.nil?)
           is_from_thread = false
           conn = TSManager.db.pop(database)
