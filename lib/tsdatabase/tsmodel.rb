@@ -5,6 +5,7 @@
 #
 
 require "tsdatabase"
+
 #
 # TODO 
 # - Thinking about dependency destroy like for a user model has_many :user_devices, :dependent => :destroy
