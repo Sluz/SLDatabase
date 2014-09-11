@@ -3,6 +3,7 @@
 #
 
 require "tsdatabase/version"
+require 'singleton'
 require 'thread'
 
 #
@@ -24,10 +25,10 @@ module TSDatabase
   class MissingAdapterError < TSDatabaseError; end
   
   class TSManager
+    include Singleton
+    
     class << self
       def database_default; @@database_default; end
-      
-      def instance;  @@my_instance ||= self.new; end
       def default; 0; end
       def preloaded; 100; end
       def keep_loaded; 200; end
