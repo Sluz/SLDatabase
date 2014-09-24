@@ -1,7 +1,5 @@
-#  Tapastreet ltd 
-#  All right reserved 
-#
 
+require 'tsdatabase' unless defined?( TSDatabase )
 require 'pg' unless defined?( PG )
 require 'tsdatabase/tsclientdb'
 

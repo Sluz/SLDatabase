@@ -1,6 +1,5 @@
-#  Tapastreet ltd 
-#  All right reserved 
-#
+
+require 'tsdatabase' unless defined?( TSDatabase )
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
