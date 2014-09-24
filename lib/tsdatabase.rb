@@ -4,7 +4,7 @@ require "tsdatabase/tsmanager"
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
-#
+# 
 module TSDatabase
   
   class TSDatabaseError < StandardError; end 
