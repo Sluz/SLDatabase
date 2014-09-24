@@ -84,14 +84,14 @@ module TSDatabase
     # \return hash of records or nil
     def find_by_id record_id, *option
       raise RecordIdError unless is_by_id?(record_id)
-      raise Postgresql::TableError unless is_table?(*option)
+      raise TableError unless is_table?(*option)
 
       find_by_query("SELECT * FROM #{ option.first } WHERE id=#{record_id};")
     end
     
     def find_by_ids record_ids, *option
       raise RecordIdError unless record_ids.is_a?(Array)
-      raise Postgresql::TableError unless is_table?(*option)
+      raise TableError unless is_table?(*option)
 
       query = "SELECT * FROM #{ option.first } WHERE "
       record_ids.each do |record_id|
@@ -104,9 +104,9 @@ module TSDatabase
     
     # \return a array whith hash of record
     def find_by_hash hash, *option
-      raise Postgresql::HashError unless hash.is_a?(Hash)
-      raise Postgresql::HashEmptyError if hash.empty?
-      raise Postgresql::TableError unless is_table?(*option)
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      raise TableError unless is_table?(*option)
       
       query = "SELECT * FROM #{ option.first } WHERE "
       hash.each do |key, value|
@@ -130,9 +130,9 @@ module TSDatabase
     
     #\return boolean exception is false or exception if failed and exception is true
     def create hash, *option  
-      raise Postgresql::HashError unless hash.is_a?(Hash)
-      raise Postgresql::HashEmptyError if hash.empty?
-      raise Postgresql::TableError unless is_table?(*option)
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      raise TableError unless is_table?(*option)
     
       query = "INSERT INTO #{option.first} "
       keys = "("
@@ -157,9 +157,9 @@ module TSDatabase
     end
     
     def update hash, *option
-      raise Postgresql::HashError unless hash.is_a?(Hash)
-      raise Postgresql::HashEmptyError if hash.empty?
-      raise Postgresql::TableError unless is_table?(*option)
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      raise TableError unless is_table?(*option)
       
       query = "UPDATE #{option.first} SET"
       hash.each do |key, value|
@@ -178,7 +178,7 @@ module TSDatabase
     
     def remove record_id, *option
       raise RecordIdError unless is_by_id?(record_id)
-      raise Postgresql::TableError unless is_table?(*option)
+      raise TableError unless is_table?(*option)
       
       find_by_query "DELETE FROM #{option.first} WHERE id = #{ record_id };"
       
