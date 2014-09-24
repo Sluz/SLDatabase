@@ -50,6 +50,11 @@ module TSDatabase
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
+    # \return array of hash of record or nil
+    def find_by_ids record_ids, *option
+      raise NotImplementedError, 'this should be overridden by concrete client'
+    end
+    
     # \return true if query is a Hash
     def is_by_hash? query
       query.is_a? Hash
