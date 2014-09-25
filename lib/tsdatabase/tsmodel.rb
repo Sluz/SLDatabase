@@ -1,11 +1,8 @@
-#  Tapastreet ltd 
-#  All right reserved 
+
+require 'tsdatabase' unless defined?( TSDatabase )
+
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
-#
-
-require "tsdatabase"
-
 #
 # TODO 
 # - Thinking about dependency destroy like for a user model has_many :user_devices, :dependent => :destroy

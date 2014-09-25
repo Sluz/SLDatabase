@@ -37,40 +37,43 @@ module TSDatabase
       @db = Orientdb4r.client @server_config
     end
 
-    def id
-
-    end
-
     # \return true if query is a record_id
     def is_by_id? query
       query.is_a?(String) && (query =~ /\A#\d+:\d+\z/)
     end
 
-    # \return hash of records or nil
+    # \return hash of record or nil
     def find_by_id record_id, *option
-      begin
-        connect
-        if (option.empty?)
-          @db.get_document record_id
-        else
-          datas = []
-          datas <<  @db.get_document(record_id)
-          option.each do |current_id|
-            datas <<  @db.get_document(current_id)
-          end
-          datas
-        end
-      rescue =>e
-        nil
+      raise RecordIdError unless is_by_id?(record_id)
+      
+      connect
+      @db.get_document record_id
+    rescue =>e
+      nil
+    end
+    
+     # \return hash of records or nil
+    def find_by_ids record_ids, *option
+      raise RecordIdError unless record_ids.is_a?(Array)
+
+      datas = []
+      record_ids.each do |current_id|
+        datas << @db.get_document(current_id)
       end
+      datas
+    rescue =>e
+      nil
     end
 
     # \return a array whith hash of record
-    def find_by_hash record_datas, *option
+    def find_by_hash hash, *option
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      
       connect
       where = ""
       from = ""
-      record_datas.each do |key, value|
+      hash.each do |key, value|
         if key === "@class"
           from = value
         else
@@ -81,12 +84,12 @@ module TSDatabase
       if from.empty?
         unless option.empty?
           from = option[0]
+        else
+          raise TableError
         end
       end
       
-      puts "select * from #{from} where #{where}"
       @db.query("select * from #{from} where #{where}")
-
     end
 
     # \return a array whith hash of record
@@ -95,66 +98,59 @@ module TSDatabase
       if (option.empty?)
         @db.query(query)
       else
-        @db.query(query, option[0])
+        @db.query(query, option.first)
       end
     end
 
     #\return boolean exception is false or exception if failed and exception is true
-    def create hash, exception = true
-      begin
-        connect
-        @db.create_document(hash)
-      rescue => e
-        if (exception)
-          raise parse_exception e
-        else
-          false
-        end
+    def create hash, *option
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      
+      connect
+      @db.create_document(hash)
+    rescue => e
+      if (option.empty? || option.last)
+        raise parse_exception e
+      else
+        false
       end
-      true
     end
 
     #\return boolean exception is false or exception if failed and exception is true
-    def update hash, exception = true
-      begin
-        connect
-        hash.extend Orientdb4r::DocumentMetadata
-        @db.update_document(hash)
-      rescue => e
-        if (exception)
-          raise parse_exception e
-        else
-          false
-        end
+    def update hash, *option
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      
+      connect
+      hash.extend Orientdb4r::DocumentMetadata
+      @db.update_document(hash)
+    rescue => e
+      if (option.empty? || option.last)
+        raise parse_exception e
+      else
+        false
       end
-      true
     end
 
     #\return boolean exception is false or exception if failed and exception is true
-    def remove record_id, exception = true
-      unless is_by_id?(record_id); if exception; raise RecordIdError  else false end end
+    def remove record_id, *option
+      raise RecordIdError unless is_by_id?(record_id)
 
-      begin
-        connect
-        @db.delete_document(record_id)
-      rescue => e
-        if (exception)
-          raise parse_exception e
-        else
-          false
-        end
+      connect
+      @db.delete_document(record_id)
+    rescue => e
+      if (option.empty? || option.last)
+        raise parse_exception e
+      else
+        false
       end
-      true
     end
 
     def connect
-      unless connected?
-        begin
-          @db.connect(@dbconfig)
-        rescue =>e
-          raise parse_exception  e
-        end
-      end
+      @db.connect(@dbconfig) unless connected?
+    rescue =>e
+      raise parse_exception  e
     end
 
     #\return true if connection is alive
@@ -163,9 +159,7 @@ module TSDatabase
     end
 
     def disconnect
-      unless @db.nil?
-        @db.disconnect
-      end
+      @db.disconnect unless @db.nil?
     end
 
     def quote value

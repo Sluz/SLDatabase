@@ -1,6 +1,5 @@
-#  Tapastreet ltd 
-#  All right reserved 
-#
+
+require 'tsdatabase' unless defined?( TSDatabase )
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
@@ -12,6 +11,10 @@ module TSDatabase
   class QueryError < TSDatabaseError; end
   class ConnectionError < TSDatabaseError; end
   
+  class TableError < QueryError; end
+  class HashError < QueryError; end
+  class HashEmptyError < QueryError; end
+
   class TSClientdb
     
     attr_reader :db
@@ -47,6 +50,11 @@ module TSDatabase
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
+    # \return array of hash of record or nil
+    def find_by_ids record_ids, *option
+      raise NotImplementedError, 'this should be overridden by concrete client'
+    end
+    
     # \return true if query is a Hash
     def is_by_hash? query
       query.is_a? Hash
@@ -73,17 +81,17 @@ module TSDatabase
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def create hash, exception = true
+    def create hash, *option
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def update hash, exception = true
+    def update hash, *option
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def remove record_id, exception = true
+    def remove record_id, *option
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     

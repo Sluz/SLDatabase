@@ -36,27 +36,34 @@ module TSDatabase
     
     # \return hash of records or nil
     def find_by_id record_id, *option
-      begin
-        if (option.empty?)
-          format_record @db.find_by_rid record_id
-        else
-          datas = @db.find_by_rids record_id, *option
-          if datas.empty?
-            nil
-          else
-            format_results datas
-          end
-        end
-      rescue =>e
+      raise RecordIdError unless is_by_id?(record_id)
+      
+      format_record @db.find_by_rid record_id
+    rescue =>e
+      nil
+    end
+    
+    def find_by_ids record_ids, *option
+      raise RecordIdError unless record_ids.is_a?(Array)
+      
+      datas = @db.find_by_rids record_ids, *option
+      if datas.empty?
         nil
+      else
+        format_results datas
       end
+    rescue =>e
+      nil
     end
     
     # \return a array whith hash of record
-    def find_by_hash record_datas, *option
+    def find_by_hash hash, *option
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+      
       where = ""
       from = ""
-      record_datas.each do |key, value|
+      hash.each do |key, value|
         if key === "@class"
           from = value
         else
@@ -67,11 +74,12 @@ module TSDatabase
       if from.empty?
         unless option.empty?
           from = option[0]
+        else
+          raise TableError
         end
       end
       
       format_results @db.all("select from #{from} where #{where}")
-      
     end
     
     # \return a array whith hash of record
@@ -80,50 +88,55 @@ module TSDatabase
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def create hash, exception = true
-      begin
-        unless class_name = hash["@class"]
-          class_name = hash[:class]
+    def create hash, *option
+      raise HashError unless hash.is_a?(Hash)
+      raise HashEmptyError if hash.empty?
+     
+      class_name = hash["@class"]
+      if class_name.nil?
+        class_name = hash[:class]
+        if class_name.nil?
+          if option.empty? == false && option[0].is_a?(String)
+            class_name = option[0]
+          else
+            raise TableError
+          end
         end
-        OrientDB::Document.create @db, class_name, hash
-      rescue => e
-        if (exception)
-          raise parse_exception  e
-        else
-          false
-        end
-        
       end
-      true
+      
+      OrientDB::Document.create @db, class_name, hash
+    rescue => e
+      if (exception)
+        raise parse_exception  e
+      else
+        false
+      end
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def update hash, exception = true
-      create hash, exception
+    def update hash, *option
+      create hash, *option
     end
     
     #\return boolean exception is false or exception if failed and exception is true
-    def remove record_id, exception = true
-      unless is_by_id?(record_id); if exception; raise RecordIdError  else false end end
-      begin
-        @db.delete(OrientDB::RID.new record_id)
-      rescue => e
-        if (exception)
-          raise parse_exception e
-        else
-          false
-        end
+    def remove record_id, *option
+      raise RecordIdError unless is_by_id?(record_id)
+      
+      @db.delete(OrientDB::RID.new record_id)
+    rescue => e
+      if (option.empty? || option.last)
+        raise parse_exception e
+      else
+        false
       end
     end
     
     def connect
       unless (connected?)
-        begin
-          @db = OrientDB::DocumentDatabase.connect @dbconfig[:url], @dbconfig[:username], @dbconfig[:password]
-        rescue =>e
-          raise parse_exception  e
-        end
+        @db = OrientDB::DocumentDatabase.connect @dbconfig[:url], @dbconfig[:username], @dbconfig[:password]
       end
+    rescue =>e
+      raise parse_exception  e
     end
     
     #\return true if connection is alive
@@ -136,9 +149,7 @@ module TSDatabase
     end
 
     def disconnect
-      unless @db.nil?
-        @db.close
-      end
+      @db.close unless @db.nil?
     end
     
     def parse_id_from hash

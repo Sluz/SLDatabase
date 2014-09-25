@@ -1,7 +1,5 @@
-#  Tapastreet ltd 
-#  All right reserved 
-#
 
+require 'tsdatabase' unless defined?( TSDatabase )
 require 'pg_jruby'
 require 'tsdatabase/tsposgresql'
 
