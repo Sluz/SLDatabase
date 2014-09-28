@@ -171,11 +171,21 @@ module TSDatabase
         end
     
         def format_record record
+            puts record.inspect
+            puts "\n ##{record[:cluster_id]}:#{record[:cluster_position]}"
             result = record[:document]       
             result["@rid"]     = "##{record[:cluster_id]}:#{record[:cluster_position]}"
+            
+            puts "\n #{record[:record_type]}"
             result["@type"]    = record[:record_type].chr
+            
+            puts "\n #{record[:record_version]}"
             result["@version"] = record[:record_version]
+            
+            puts "\n #{record[:cluster_position]} - #{@db.get_cluster(record[:cluster_position]).inspect}"
             result["@class"]   = @db.get_cluster(record[:cluster_position])[:name]
+ 
+            puts "\n\n"
             result
         end
 
@@ -245,14 +255,10 @@ module TSDatabase
                     record_id = record_id[:"@rid"]||record_id["@rid"]
                 end
                 
-                unless record_id.is_a? String
-                    raise RecordIdError
+                if record_id.is_a? String &&  record_id =~ /\A#\d+:\d+\z/
+                    record_id = OrientDbClient::Rid.new record_id
                 else
-                    data = record_id.split(":")
-                    if (data.size < 2)
-                        raise RecordIdError
-                    end
-                    record_id = OrientDbClient::Rid.new data[0].to_i, data[1].to_i
+                    raise RecordIdError
                 end
             end
             
