@@ -44,7 +44,7 @@ module TSDatabase
 
         # \return hash of record or nil
         def find_by_id record_id, *option
-            @db.query("select * from #{format_id_string record_id}")
+            format_results @db.query("select * from #{format_id_string record_id}")
         rescue =>e
             nil
         end
@@ -59,7 +59,7 @@ module TSDatabase
             end
             query.gsub!(/,\z/, "];")
             
-            @db.query(query)
+            format_results @db.query(query)
         rescue =>e
             nil
         end
@@ -87,17 +87,17 @@ module TSDatabase
                 end
             end
       
-            @db.query("select * from #{from} where #{where}")
+            format_results @db.query("select * from #{from} where #{where}")
         end
 
         # \return a array whith hash of record
         def find_by_query query, *option
             if (option.empty?)
-                @db.query(query)
+                format_results @db.query(query)
             else
                 raise HashError unless option.first.is_a?(Hash)
                 raise HashEmptyError if option.first.empty?
-                @db.query(query, option.first)
+                format_results @db.query(query, option.first)
             end
         end
 
@@ -160,6 +160,23 @@ module TSDatabase
 
         def disconnect
             @db.close unless @db.nil?
+        end
+        
+        def format_results datas
+            result = []
+            for record in datas
+                result << format_record(record)
+            end
+            result
+        end
+    
+        def format_record record
+            result = record[:document]       
+            result["@rid"]     = "##{record[:cluster_id]}:#{record[:cluster_position]}"
+            result["@type"]    = record[:record_type].chr
+            result["@version"] = record[:record_version]
+            result["@class"]   = @db.get_cluster(record[:cluster_position])[:name]
+            result
         end
 
         def quote value
