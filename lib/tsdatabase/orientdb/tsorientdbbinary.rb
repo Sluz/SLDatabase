@@ -44,9 +44,7 @@ module TSDatabase
 
         # \return hash of record or nil
         def find_by_id record_id, *option
-            raise RecordIdError unless is_by_id?(record_id)
-      
-            @db.get_document record_id
+            @db.query("select * from #{format_id_string record_id}")
         rescue =>e
             nil
         end
@@ -55,11 +53,13 @@ module TSDatabase
         def find_by_ids record_ids, *option
             raise RecordIdError unless record_ids.is_a?(Array)
 
-            datas = []
-            record_ids.each do |current_id|
-                datas << @db.get_document(current_id)
+            query = "select * from ["
+            record_ids.each do |record_id|
+              query << " #{format_id_string record_id},"
             end
-            datas
+            query.gsub!(/,\z/, "];")
+            
+            @db.query(query)
         rescue =>e
             nil
         end
@@ -242,6 +242,20 @@ module TSDatabase
             record_id
         end
         
+        def format_id_string record_or_id
+            record_id = record_or_id
+            
+            if record_id.is_a? Hash
+                record_id = record_id[:"@rid"]||record_id["@rid"]
+            end
+                
+            if record_id.is_a? String &&  record_id =~ /\A#\d+:\d+\z/
+                record_id
+            else
+                raise RecordIdError
+            end
+        end
+        
         def format_version record_or_version
             record_version = record_or_version
             
@@ -250,9 +264,13 @@ module TSDatabase
             end
             
             if record_version.is_a? String
+                record_version = record_version.to_i
+            end
+            
+            if record_version.is_a? Fixnum
                 record_version
             else  
-                raise RecordVersionError
+                raise TableError
             end
         end
         
