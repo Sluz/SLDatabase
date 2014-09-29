@@ -317,5 +317,26 @@ module TSDatabase
                 raise TableError
             end
         end
+        
+        def get_cluster_string record_or_cluster_id
+             cluster_name = record_or_cluster_id
+            
+            if cluster_name.is_a? Hash
+                cluster_name = record_id[:"@class"]||record_id["@class"]
+            end
+            
+            if cluster_name.is_a? Fixnum
+                tmp = @db.get_cluster cluster_id
+                unless (tmp.nil?) 
+                    cluster_name = tmp[:name]
+                end
+            end
+            
+            if cluster_name.is_a? String
+                cluster_name
+            else  
+                raise TableError
+            end
+        end
     end
 end
