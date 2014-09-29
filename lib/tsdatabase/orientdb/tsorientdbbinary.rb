@@ -273,7 +273,7 @@ module TSDatabase
             record_version = record_or_version
             
             if record_version.is_a? Hash
-                record_version = record_id[:"@version"]||record_id["@version"]
+                record_version = record_or_version[:"@version"]||record_or_version["@version"]
             end
             
             if record_version.is_a? String
@@ -291,7 +291,7 @@ module TSDatabase
             cluster_id = record_or_cluster_id
             
             if cluster_id.is_a? Hash
-                cluster_id = record_id[:"@class"]||record_id["@class"]
+                cluster_id = record_or_cluster_id[:"@class"]||record_or_cluster_id["@class"]
             end
             
             if cluster_id.is_a? String
@@ -312,7 +312,7 @@ module TSDatabase
              cluster_name = record_or_cluster_id
             
             if cluster_name.is_a? Hash
-                cluster_name = record_id[:"@class"]||record_id["@class"]
+                cluster_name = record_or_cluster_id[:"@class"]||record_or_cluster_id["@class"]
             end
             
             if cluster_name.kind_of? Fixnum
