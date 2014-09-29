@@ -317,6 +317,7 @@ module TSDatabase
             
             if cluster_name.is_a? Numeric
                 tmp = @db.get_cluster cluster_name
+                puts tmp.inspect
                 unless (tmp.nil?) 
                     cluster_name = tmp[:name]
                 end
