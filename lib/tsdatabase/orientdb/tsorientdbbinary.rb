@@ -171,21 +171,11 @@ module TSDatabase
         end
     
         def format_record record
-            puts record.inspect
-            puts "\n ##{record[:cluster_id]}:#{record[:cluster_position]}"
             result = record[:document]       
             result["@rid"]     = "##{record[:cluster_id]}:#{record[:cluster_position]}"
-            
-            puts "\n #{record[:record_type]}"
             result["@type"]    = record[:record_type].chr
-            
-            puts "\n #{record[:record_version]}"
             result["@version"] = record[:record_version]
-            
-            puts "\n #{record[:cluster_position]} - #{@db.get_cluster(record[:cluster_position]).inspect}"
-            result["@class"]   = @db.get_cluster(record[:cluster_position])[:name]
- 
-            puts "\n\n"
+            result["@class"]   = @db.get_cluster_string(record[:cluster_position])
             result
         end
 
