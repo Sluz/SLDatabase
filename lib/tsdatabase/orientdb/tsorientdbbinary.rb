@@ -316,7 +316,7 @@ module TSDatabase
             end
             
             if cluster_name.is_a? Fixnum
-                tmp = @db.get_cluster cluster_id
+                tmp = @db.get_cluster cluster_name
                 unless (tmp.nil?) 
                     cluster_name = tmp[:name]
                 end
