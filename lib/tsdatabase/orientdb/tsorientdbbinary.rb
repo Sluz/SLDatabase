@@ -175,7 +175,7 @@ module TSDatabase
             result["@rid"]     = "##{record[:cluster_id]}:#{record[:cluster_position]}"
             result["@type"]    = record[:record_type].chr
             result["@version"] = record[:record_version]
-            result["@class"]   = get_cluster_string record[:cluster_position]
+            result["@class"]   = get_cluster_string record[:cluster_id]
             result
         end
 
@@ -317,13 +317,11 @@ module TSDatabase
             
             if cluster_name.kind_of? Fixnum
                 tmp = @db.get_cluster cluster_name
-                puts "tmp"
-                puts tmp.inspect
                 unless (tmp.nil?) 
                     cluster_name = tmp[:name]
                 end
             end
-            puts "cluster_name => #{cluster_name}"
+            
             if cluster_name.is_a? String
                 cluster_name
             else  
