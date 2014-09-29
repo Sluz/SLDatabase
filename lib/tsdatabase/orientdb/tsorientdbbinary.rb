@@ -245,7 +245,7 @@ module TSDatabase
                     record_id = record_id[:"@rid"]||record_id["@rid"]
                 end
                 
-                if record_id.is_a? String &&  record_id =~ /\A#\d+:\d+\z/
+                if record_id.is_a?(String) &&  record_id =~ /\A#\d+:\d+\z/
                     record_id = OrientDbClient::Rid.new record_id
                 else
                     raise RecordIdError
@@ -262,7 +262,7 @@ module TSDatabase
                 record_id = record_id[:"@rid"]||record_id["@rid"]
             end
                 
-            if record_id.is_a? String &&  record_id =~ /\A#\d+:\d+\z/
+            if record_id.is_a?(String) &&  record_id =~ /\A#\d+:\d+\z/
                 record_id
             else
                 raise RecordIdError
@@ -273,7 +273,7 @@ module TSDatabase
             record_version = record_or_version
             
             if record_version.is_a? Hash
-                record_version = record_or_version[:"@version"]||record_or_version["@version"]
+                record_version = record_version[:"@version"]||record_version["@version"]
             end
             
             if record_version.is_a? String
@@ -291,10 +291,10 @@ module TSDatabase
             cluster_id = record_or_cluster_id
             
             if cluster_id.is_a? Hash
-                cluster_id = record_or_cluster_id[:"@class"]||record_or_cluster_id["@class"]
+                cluster_id = cluster_id[:"@class"]||cluster_id["@class"]
             end
             
-            if cluster_id.is_a? String
+            if cluster_id.is_a?(String)
                 tmp = @db.get_cluster cluster_id
                 unless (tmp.nil?) 
                     cluster_id = tmp[:id].to_i
@@ -312,7 +312,7 @@ module TSDatabase
              cluster_name = record_or_cluster_id
             
             if cluster_name.is_a? Hash
-                cluster_name = record_or_cluster_id[:"@class"]||record_or_cluster_id["@class"]
+                cluster_name = cluster_name[:"@class"]||cluster_name["@class"]
             end
             
             if cluster_name.kind_of? Fixnum
