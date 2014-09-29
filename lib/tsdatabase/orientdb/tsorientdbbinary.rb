@@ -321,7 +321,7 @@ module TSDatabase
                     cluster_name = tmp[:name]
                 end
             end
-            
+            puts "cluster_name => #{cluster_name}"
             if cluster_name.is_a? String
                 cluster_name
             else  
