@@ -301,7 +301,7 @@ module TSDatabase
                 end
             end
             
-            if cluster_id.is_a? Fixnum
+            if cluster_id.is_a? Numeric
                 cluster_id
             else  
                 raise TableError
@@ -315,7 +315,7 @@ module TSDatabase
                 cluster_name = record_id[:"@class"]||record_id["@class"]
             end
             
-            if cluster_name.is_a? Fixnum
+            if cluster_name.is_a? Numeric
                 tmp = @db.get_cluster cluster_name
                 unless (tmp.nil?) 
                     cluster_name = tmp[:name]
