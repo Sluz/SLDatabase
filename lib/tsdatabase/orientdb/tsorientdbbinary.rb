@@ -165,12 +165,7 @@ module TSDatabase
         def format_results datas
             result = []
             for record in datas
-                puts "\n#---###########################################\n"
-                puts "#{record.inspect}"
-                puts "\n#-2-###########################################\n"
                 result << format_record(record)
-                puts "#{result.last.inspect}"
-                puts "\n#---###########################################\n"
             end
             result
         end
