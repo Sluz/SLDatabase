@@ -163,9 +163,16 @@ module TSDatabase
         end
         
         def format_results datas
+          
+            
             result = []
             for record in datas
+                puts "\n#---###########################################\n"
+                puts "#{record.inspext}"
+                puts "\n#-2-###########################################\n"
                 result << format_record(record)
+                puts "#{result.last}"
+                puts "\n#---###########################################\n"
             end
             result
         end
