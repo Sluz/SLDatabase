@@ -7,6 +7,7 @@ require 'tsdatabase' unless defined?( TSDatabase )
 module TSDatabase
   
   class RecordIdError < TSDatabaseError; end
+  class RecordVersionError < TSDatabaseError; end
   class RecordDuplicateError < TSDatabaseError; end
   class QueryError < TSDatabaseError; end
   class ConnectionError < TSDatabaseError; end
