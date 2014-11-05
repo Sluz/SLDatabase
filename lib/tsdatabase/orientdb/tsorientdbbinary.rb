@@ -175,7 +175,7 @@ module TSDatabase
             result["@rid"]     = "##{record[:cluster_id]}:#{record[:cluster_position]}"
             result["@type"]    = record[:record_type].chr
             result["@version"] = record[:record_version]
-            result["@class"]   = get_cluster_string record[:cluster_id]
+            result["@class"]   = record[:class] || get_cluster_string(record[:cluster_id]) 
             result
         end
 
