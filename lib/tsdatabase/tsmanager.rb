@@ -125,15 +125,15 @@ module TSDatabase
                     clt = TSPostgresql.new config
                 end
             when :orientdb
-                #        if (RUBY_PLATFORM === "java")
-                #          require 'tsdatabase/orientdb/jtsorientdb'
-                #          clt = JTSOrientdb.new config
-                #        else
-                #          require 'tsdatabase/orientdb/tsorientdb'
-                #          clt = TSOrientdb.new config
-                #        end
-                require 'tsdatabase/orientdb/tsorientdbbinary'
-                clt = TSOrientdbBinary.new config 
+                if (RUBY_PLATFORM === "java")
+                  require 'tsdatabase/orientdb/jtsorientdb'
+                  clt = JTSOrientdb.new config
+                else
+                  require 'tsdatabase/orientdb/tsorientdb'
+                  clt = TSOrientdb.new config
+                end
+#                require 'tsdatabase/orientdb/tsorientdbbinary'
+#                clt = TSOrientdbBinary.new config 
             else
                 raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"
             end
