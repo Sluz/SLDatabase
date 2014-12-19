@@ -109,7 +109,7 @@ module TSDatabase
       
             OrientDB::Document.create @db, class_name, hash
         rescue => e
-            if (exception)
+            if (e)
                 raise parse_exception  e
             else
                 false
