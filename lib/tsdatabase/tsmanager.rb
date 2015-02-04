@@ -120,7 +120,7 @@ module TSDatabase
         end
         
         def config_hash(json_hash, mode='production')
-            @dbconfig = json_hash=[mode]
+            @dbconfig = json_hash[mode]
             generate_clients
         end
     
