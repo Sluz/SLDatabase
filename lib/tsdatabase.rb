@@ -51,7 +51,7 @@ module TSDatabase
                 extname = File.extname(filename_or_hash.path) 
             end
             
-            if extname.nil?
+            unless extname.nil?
                 if extname === ".json"
                     TSDatabase::TSManager.instance.config_json filename_or_hash, mode
                 elsif extname === ".yml"
