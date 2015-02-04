@@ -152,7 +152,7 @@ module TSDatabase
         #\return true if connection is alive
         def connected?
             unless @db.nil?
-              !@db.isClosed 
+              !@connect.closed? 
             else
               false
             end
