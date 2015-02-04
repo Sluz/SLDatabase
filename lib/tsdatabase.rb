@@ -7,13 +7,65 @@ require "tsdatabase/tsmanager"
 # 
 module TSDatabase
   
-  class TSDatabaseError < StandardError; end 
-  class ConfigurationError < TSDatabaseError; end
+  class TSDatabaseError < StandardError 
+    def initialize message_or_symbol
+        if message_or_symbol.is_a? Symbol
+            super message_for(message_or_symbol)
+        else
+            super message_or_symbol
+        end
+    end
+    
+    def message_for symbol
+        "Undefined #{symbol} error"
+    end
+    
+  end 
   class MissingAdapterError < TSDatabaseError; end
+  
+  class ConfigurationError < TSDatabaseError
+      def message_for symbol
+          case symbol
+          when :multiple
+              "Multiple configuration"
+          when :file
+              "Incompatible file is not a File or Path"
+          when :format
+              "Incompatible format require file extention .json or .yml"
+          else
+              super symbol
+          end
+      end
+  end
   
 
   # Module function
   class << self 
+    def load_configuration filename_or_hash
+        #--- Generate hash of server option
+        if filename_or_hash.is_a? Hash
+            TSDatabase::TSManager.instance.config_hash filename_or_hash
+        else
+            if filename_or_hash.is_a? String 
+                extname = File.extname(filename_or_hash) 
+            elsif filename_or_hash.is_a? File 
+                extname = File.extname(filename_or_hash.path) 
+            end
+            
+            if extname.nil?
+                if extname === ".json"
+                    TSDatabase::TSManager.instance.config_json filename_or_hash
+                elsif extname === ".yml"
+                    TSDatabase::TSManager.instance.config_yml filename_or_hash
+                else
+                    raise ConfigurationError.new :format
+                end
+            else
+                raise ConfigurationError.new :file
+            end
+        end
+    end
+    
     def instance;    TSManager.instance;    end
     def default;     TSManager.default;     end
     def preloaded;   TSManager.preloaded;   end

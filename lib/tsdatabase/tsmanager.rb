@@ -90,8 +90,7 @@ module TSDatabase
             if (@dbconfig.nil?)
                 require 'yaml'
                 yaml_hash= YAML::load(File.open(filename))
-                @dbconfig = yaml_hash[mode]
-                generate_clients 
+                config_hash yaml_hash, mode
             else
                 raise ConfigurationError, "Multiple configuration"
             end
@@ -101,12 +100,22 @@ module TSDatabase
         def config_json(filename, mode="production")
             if (@dbconfig.nil?)
                 require "multi_json"
-                json_hash= MultiJson.load(File.open(filename))
-                @dbconfig = json_hash=[mode]
-                generate_clients
+                if filename.is_a? String
+                    json_hash = MultiJson.load(File.open(filename))
+                elsif filename.is_a? File
+                    json_hash = MultiJson.load(filename)
+                else
+                    raise ConfigurationError.new :file
+                end
+                config_hash json_hash, mode
             else
-                raise ConfigurationError, "Multiple configuration"
+                raise ConfigurationError.new :multiple
             end
+        end
+        
+        def config_hash(json_hash, mode="production")
+            @dbconfig = json_hash=[mode]
+            generate_clients
         end
     
         #
