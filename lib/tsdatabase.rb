@@ -38,13 +38,12 @@ module TSDatabase
       end
   end
   
-
   # Module function
   class << self 
-    def load_configuration filename_or_hash
+    def load_configuration filename_or_hash, mode="production"
         #--- Generate hash of server option
         if filename_or_hash.is_a? Hash
-            TSDatabase::TSManager.instance.config_hash filename_or_hash
+            TSDatabase::TSManager.instance.config_hash filename_or_hash, mode
         else
             if filename_or_hash.is_a? String 
                 extname = File.extname(filename_or_hash) 
@@ -54,9 +53,9 @@ module TSDatabase
             
             if extname.nil?
                 if extname === ".json"
-                    TSDatabase::TSManager.instance.config_json filename_or_hash
+                    TSDatabase::TSManager.instance.config_json filename_or_hash, mode
                 elsif extname === ".yml"
-                    TSDatabase::TSManager.instance.config_yml filename_or_hash
+                    TSDatabase::TSManager.instance.config_yml filename_or_hash, mode
                 else
                     raise ConfigurationError.new :format
                 end
