@@ -86,20 +86,26 @@ module TSDatabase
         alias_method :close_all, :all_close
 
         #\brief before to use you need to have in your Gems yaml 
-        def config_yml(filename, mode="production")
+        def config_yml(filename, mode='production')
             if (@dbconfig.nil?)
                 require 'yaml'
-                yaml_hash= YAML::load(File.open(filename))
-                config_hash yaml_hash, mode
+                if filename.is_a? String
+                    json_hash = YAML::load(File.open(filename))
+                elsif filename.is_a? File
+                    json_hash = YAML::load(filename)
+                else
+                    raise ConfigurationError.new :file
+                end
+                config_hash json_hash, mode
             else
                 raise ConfigurationError, "Multiple configuration"
             end
         end
     
         #\brief before to use you need to have in your Gems multi_json
-        def config_json(filename, mode="production")
+        def config_json(filename, mode='production')
             if (@dbconfig.nil?)
-                require "multi_json"
+                require 'multi_json'
                 if filename.is_a? String
                     json_hash = MultiJson.load(File.open(filename))
                 elsif filename.is_a? File
@@ -113,7 +119,7 @@ module TSDatabase
             end
         end
         
-        def config_hash(json_hash, mode="production")
+        def config_hash(json_hash, mode='production')
             @dbconfig = json_hash=[mode]
             generate_clients
         end
@@ -170,9 +176,7 @@ module TSDatabase
 
         def generate_clients
             unless @dbconfig.nil?
-                case
-            
-                when (@dbconfig.is_a? Hash)
+                if (@dbconfig.is_a? Hash)
                     @dbconfig.each do |keys, config|
             
                         if (@@database_default.nil?)
@@ -185,7 +189,7 @@ module TSDatabase
                         @clients[keys.to_sym] = qclients config
                     end
             
-                when (@dbconfig.is_a? Array)
+                elsif (@dbconfig.is_a? Array)
                     @dbconfig.each do |config |
                         if (@@database_default.nil?)
                             @@database_default = config["database"].to_sym
