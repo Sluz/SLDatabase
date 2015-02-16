@@ -129,7 +129,7 @@ module TSDatabase
         # => orientdb
         #
         def client config
-            case config["adapter"].to_sym
+            case config[:adapter].to_sym
             when :postgresql
                 if (RUBY_PLATFORM === "java")
                     require 'tsdatabase/postgresql/jtspostgresql'
@@ -149,7 +149,7 @@ module TSDatabase
 #                require 'tsdatabase/orientdb/tsorientdbbinary'
 #                clt = TSOrientdbBinary.new config 
             else
-                raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"
+                raise MissingAdapterError, "Adapter #{ config[:adapter] } are not supported"
             end
       
             if (self.class.mode == self.class.mode_preloaded)
@@ -163,10 +163,10 @@ module TSDatabase
     
         def qclients config
             qclient = Queue.new 
-            if config["pool"].nil?
+            if config[:pool].nil?
                 qclient.push(client config)
             else
-                (1..config["pool"]).each do 
+                (1..config[:pool]).each do 
                     qclient.push(client config)
                 end
             end

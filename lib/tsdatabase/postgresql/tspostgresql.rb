@@ -13,29 +13,17 @@ module TSDatabase
     def initialize option={}
       @dbconfig = {}
       
-      unless option["host"].nil?
-        @dbconfig[:hostaddr] = option["host"]
+      unless option[:"host"].nil?
+        @dbconfig[:hostaddr] = option[:"host"]
       end
       
-      unless option["port"].nil?
-        @dbconfig[:port] = option["port"]
-      end
-      
-      unless option["username"].nil?
-        @dbconfig[:user] = option["username"]
-      end
-      
-      unless option["password"].nil?
-        @dbconfig[:password] = option["password"]
-      end
-      
-      unless option["database"].nil?
-        @dbconfig[:dbname] = option["database"]
+      unless option[:database].nil?
+        @dbconfig[:dbname] = option[:database]
       end
       
       # "postgresql://username:password@host:port/database"
-      unless (option["url"].nil?)
-        url = option["url"].gsub(/\Apostgresql:\/\//, "")
+      unless (option[:"url"].nil?)
+        url = option[:"url"].gsub(/\Apostgresql:\/\//, "")
         url.gsub(/[\w:@\.\-]+/) do |config|
           
           config.gsub(/\A[\w:]+@/) do |user_pass|

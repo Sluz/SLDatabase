@@ -14,18 +14,18 @@ module TSDatabase
 
         def initialize option={}
             
-            @database = option["database"]
+            @database = option[:"database"]
             @credential = {
-                :user => option["username"],
-                :password => option["password"]
+                :user => option[:"username"],
+                :password => option[:"password"]
             }
-            @host = option["host"]
+            @host = option[:"host"]
               
             @server_config = {}
-            @server_config[:port] = option["port"] unless option["port"].nil?
+            @server_config[:port] = option[:"port"] unless option[:"port"].nil?
             @server_config[:port] = 2424 if @server_config[:port].nil?
             
-            mode= option["mode"] unless option["mode"].nil?
+            mode= option[:"mode"] unless option[:"mode"].nil?
             mode= OrientDB::Type::DOCUMENT if mode.nil?
         end
         

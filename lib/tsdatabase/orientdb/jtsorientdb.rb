@@ -19,23 +19,17 @@ module TSDatabase
   class JTSOrientdb < TSClientdb
     
     def initialize option={}
-      @dbconfig = {
-        :username => option["username"],
-        :password => option["password"],
-        :database => option["database"]
-      }
+      @dbconfig = option
       
-      if (option["url"].nil?)
-        if (option["port"].nil?)
-          @dbconfig[:url] = "remote:#{ option["host"] }/#{ option["database"] }"
+      if (@dbconfig[:"url"].nil?)
+        if (@dbconfig[:"port"].nil?)
+          @dbconfig[:url] = "remote:#{ @dbconfig[:"host"] }/#{ @dbconfig[:"database"] }"
         else
-          @dbconfig[:url] = "remote:#{ option["host"] }:#{ option["port"] }/#{ option["database"] }"
+          @dbconfig[:url] = "remote:#{ @dbconfig[:"host"] }:#{ @dbconfig[:"port"] }/#{ @dbconfig[:"database"] }"
         end
-      else 
-        @dbconfig[:url] = option["url"]
       end
       
-      @mode = option["mode"] if option["mode"]
+      @mode = @dbconfig[:"mode"] if @dbconfig[:"mode"]
       @mode = OrientDB::Type::DOCUMENT if @mode.nil?
     end
     

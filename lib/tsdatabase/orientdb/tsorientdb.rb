@@ -13,15 +13,15 @@ module TSDatabase
 
     def initialize option={}
       @dbconfig = {
-        :user => option["username"],
-        :password => option["password"],
-        :database => option["database"],
+        :user => option[:"username"],
+        :password => option[:"password"],
+        :database => option[:"database"],
       }
 
       @server_config = {
-        :host => option["host"],
-        :port => option["port"],
-        :ssl  => option["ssl"]
+        :host => option[:"host"],
+        :port => option[:"port"],
+        :ssl  => option[:"ssl"]
       }
 
       #if (option["url"].nil?)
