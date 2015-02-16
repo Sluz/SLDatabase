@@ -17,35 +17,34 @@ module TSDatabase
     class TSManager
         include Singleton
     
+        attr_accessor :clients
+        attr_accessor :configuration
+        
         class << self
-            def database_default; @@database_default; end
-            def default; 0; end
-            def preloaded; 100; end
-            def keep_loaded; 200; end
-      
-            # \param mode could be
+            attr_accessor :mode
+            attr_accessor :database_default
+            
             # => :DEFAULT : disconnect client on push 
+            def mode_default; 0; end
             # => :PRELOADED : don't disconnect client on push and connect on initialisation \see :config_json or :config_yml
+            def mode_preloaded; 100; end
             # => :KEEP_LOADED : don't disconnect client on push    
-            def set_mode(mode);@@mode = mode; end
+            def mode_keep_loaded; 200; end
       
             alias_method :db, :instance
         end
     
-        @@mode = TSManager.default
-        @@database_default = nil
-    
         def initialize
-            @clients = {}
-            @dbconfig = nil
+            self.class.mode = self.class.mode_default if self.class.mode.nil?
+            self.clients = {}
         end
     
-        def pop_connection(database = @@database_default)
+        def pop_connection(database = self.class.database_default)
             connections = Thread.current[:tsclientdb]
-            if (connections.nil?)
-                Thread.current[:tsclientdb]={}
+            if connections.nil?
+                Thread.current[:tsclientdb] = {}
             end
-            clt = Thread.current[:tsclientdb][database] ||= @clients[database].pop
+            clt = Thread.current[:tsclientdb][database] ||= clients[database].pop
             clt.connect
             clt
         end
@@ -54,14 +53,14 @@ module TSDatabase
         alias_method :pop,  :pop_connection
         alias_method :open, :pop_connection
 
-        def push_connection(database = @@database_default)
+        def push_connection(database = self.class.database_default)
             connections = Thread.current[:tsclientdb][database]
-            unless (connections.nil?)
+            unless connections.nil?
                 Thread.current[:tsclientdb].delete(database)
-                if (@@mode==TSManager.default)
+                if self.class.mode == self.class.mode_default
                     connections.disconnect
                 end
-                @clients[database].push connections
+                clients[database].push connections
             end
         end
     
@@ -74,10 +73,10 @@ module TSDatabase
             connections = Thread.current[:tsclientdb]
             unless (connections.nil?)
                 connections.each do |key, value|
-                    if (@@mode==TSManager.default)
+                    if self.class.mode == self.class.mode_default
                         value.disconnect
                     end
-                    @clients[key].push value
+                    clients[key].push value
                 end
                 Thread.current[:tsclientdb] = nil
             end
@@ -87,7 +86,7 @@ module TSDatabase
 
         #\brief before to use you need to have in your Gems yaml 
         def config_yml(filename, mode='production')
-            if (@dbconfig.nil?)
+            if configuration.nil?
                 require 'yaml'
                 if filename.is_a? String
                     json_hash = YAML::load(File.open(filename))
@@ -104,7 +103,7 @@ module TSDatabase
     
         #\brief before to use you need to have in your Gems multi_json
         def config_json(filename, mode='production')
-            if (@dbconfig.nil?)
+            if configuration.nil?
                 require 'multi_json'
                 if filename.is_a? String
                     json_hash = MultiJson.load(File.open(filename))
@@ -120,7 +119,7 @@ module TSDatabase
         end
         
         def config_hash(json_hash, mode='production')
-            @dbconfig = json_hash[mode]
+            self.configuration = json_hash[mode]
             generate_clients
         end
     
@@ -153,7 +152,7 @@ module TSDatabase
                 raise MissingAdapterError, "Adapter #{ config["adapter"] } are not supported"
             end
       
-            if (@@mode == TSManager.preloaded)
+            if (self.class.mode == self.class.mode_preloaded)
                 clt.connect
             end
       
@@ -175,26 +174,26 @@ module TSDatabase
         end
 
         def generate_clients
-            unless @dbconfig.nil?
-                if (@dbconfig.is_a? Hash)
-                    @dbconfig.each do |keys, config|
+            unless configuration.nil?
+                if (configuration.is_a? Hash)
+                    configuration.each do |keys, config|
             
-                        if (@@database_default.nil?)
-                            @@database_default = keys.to_sym
+                        if (self.class.database_default.nil?)
+                            self.class.database_default = keys.to_sym
                         end
             
                         if (config["database"].nil?)
                             config["database"] = keys
                         end
-                        @clients[keys.to_sym] = qclients config
+                        clients[keys.to_sym] = qclients config
                     end
             
-                elsif (@dbconfig.is_a? Array)
-                    @dbconfig.each do |config |
-                        if (@@database_default.nil?)
-                            @@database_default = config["database"].to_sym
+                elsif (configuration.is_a? Array)
+                    configuration.each do |config |
+                        if (self.class.database_default.nil?)
+                            self.class.database_default = config["database"].to_sym
                         end
-                        @clients[config["database"].to_sym] = qclients config
+                        clients[config["database"].to_sym] = qclients config
                     end
             
                 else
@@ -204,5 +203,6 @@ module TSDatabase
                 raise ConfigurationError, "No configuration file setting"
             end
         end
+
     end
 end
