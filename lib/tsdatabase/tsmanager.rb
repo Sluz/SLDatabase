@@ -185,7 +185,7 @@ module TSDatabase
                         if (config[:database].nil?)
                             config[:database] = keys
                         end
-                        clients[keys] = qclients config
+                        clients[keys.to_sym] = qclients config
                     end
             
                 elsif (configuration.is_a? Array)
@@ -193,7 +193,7 @@ module TSDatabase
                         if (self.class.database_default.nil?)
                             self.class.database_default = config[:database].to_sym
                         end
-                        clients[ config[:database] ] = qclients config
+                        clients[ config[:database].to_sym ] = qclients config
                     end
             
                 else
