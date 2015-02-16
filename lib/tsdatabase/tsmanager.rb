@@ -102,11 +102,11 @@ module TSDatabase
         end
     
         #\brief before to use you need to have in your Gems multi_json
-        def config_json(filename, mode='production')
+        def config_json(filename, mode= :production)
             if configuration.nil?
                 require 'multi_json'
                 if filename.is_a? String
-                    json_hash = MultiJson.load(File.open(filename))
+                    json_hash = MultiJson.load(File.open(filename), :symbolize_keys => true)
                 elsif filename.is_a? File
                     json_hash = MultiJson.load(filename)
                 else
@@ -118,7 +118,7 @@ module TSDatabase
             end
         end
         
-        def config_hash(json_hash, mode='production')
+        def config_hash(json_hash, mode= :production)
             self.configuration = json_hash[mode]
             generate_clients
         end
@@ -182,18 +182,18 @@ module TSDatabase
                             self.class.database_default = keys.to_sym
                         end
             
-                        if (config["database"].nil?)
-                            config["database"] = keys
+                        if (config[:database].nil?)
+                            config[:database] = keys
                         end
-                        clients[keys.to_sym] = qclients config
+                        clients[keys] = qclients config
                     end
             
                 elsif (configuration.is_a? Array)
                     configuration.each do |config |
                         if (self.class.database_default.nil?)
-                            self.class.database_default = config["database"].to_sym
+                            self.class.database_default = config[:database].to_sym
                         end
-                        clients[config["database"].to_sym] = qclients config
+                        clients[ config[:database] ] = qclients config
                     end
             
                 else
