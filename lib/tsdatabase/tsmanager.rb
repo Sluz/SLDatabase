@@ -85,7 +85,7 @@ module TSDatabase
         alias_method :close_all, :all_close
 
         #\brief before to use you need to have in your Gems yaml 
-        def config_yml(filename, mode='production')
+        def config_yml(filename, mode = :production)
             if configuration.nil?
                 require 'yaml'
                 if filename.is_a? String
@@ -102,7 +102,7 @@ module TSDatabase
         end
     
         #\brief before to use you need to have in your Gems multi_json
-        def config_json(filename, mode= :production)
+        def config_json(filename, mode = :production)
             if configuration.nil?
                 require 'multi_json'
                 if filename.is_a? String
