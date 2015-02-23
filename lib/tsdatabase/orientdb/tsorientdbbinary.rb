@@ -74,8 +74,10 @@ module TSDatabase
             hash.each do |key, value|
                 if key === "@class"
                     from = value
+                elsif where.empty?
+                    where += "#{key.to_s}=#{ quote(value) }"
                 else
-                    where += key.to_s+"=#{ quote(value) }"
+                    where += " AND #{key.to_s}=#{ quote(value) }"
                 end
             end
 
