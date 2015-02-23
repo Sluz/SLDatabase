@@ -247,7 +247,12 @@ module TSDatabase
     end
     
     def quote value
-        @db.quote value
+        case value
+            when Numeric
+            "'#{value}'"
+        else
+            @db.quote value
+        end
     end
     
   end
