@@ -71,7 +71,7 @@ module TSDatabase
         if key === "@class"
           from = value
         else
-          where += key.to_s+"=#{ @db.quote(value) } "
+          where += key.to_s+"=#{ quote value } "
         end
       end
       
@@ -243,5 +243,10 @@ module TSDatabase
        
       except
     end
+    
+    def quote value
+        @db.quote value
+    end
+    
   end
 end
