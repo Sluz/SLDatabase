@@ -9,10 +9,6 @@ require 'tsdatabase/tsclientdb'
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
 module TSDatabase
-    module OrientDB
-        include JOrientDB
-    end
-    
     class JTSOrientdb < TSClientdb
         attr_accessor :enable_hash_record
         attr_reader :db
