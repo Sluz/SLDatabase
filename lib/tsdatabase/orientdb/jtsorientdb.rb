@@ -125,8 +125,13 @@ module TSDatabase
         def update hash, *option
             exception = (option.empty? || option.last === true)
             format_record(create hash)
-        rescue RecordDuplicateError => duplicated
-            record = @db.find_by_rid(duplicated.rid)
+        rescue Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException, RecordDuplicateError => duplicated
+            if duplicated.is_a? Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException
+                rid = duplicated.getRid()
+            else
+                rid = duplicated.rid
+            end
+            record = @db.find_by_rid(rid)
             hash.each do |key, value|
                 key = key.to_s
                 unless key =~ /\A@/
@@ -136,7 +141,7 @@ module TSDatabase
             OrientDB::Document.create(@db, record.getClassName(), hash)
         rescue => e
             if exception
-                raise parse_exception  e
+                raise e
             else
                 false
             end
