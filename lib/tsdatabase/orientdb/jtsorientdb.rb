@@ -17,10 +17,12 @@ module TSDatabase
   end
   
   class JTSOrientdb < TSClientdb
+    attr_accessor :enable_hash_record
+    attr_reader :db
     
     def initialize option={}
       @dbconfig = option
-      
+      self.enable_hash_record = true
       if (@dbconfig[:"url"].nil?)
         if (@dbconfig[:"port"].nil?)
           @dbconfig[:url] = "remote:#{ @dbconfig[:"host"] }/#{ @dbconfig[:"database"] }"
@@ -110,7 +112,7 @@ module TSDatabase
         end
       end
      
-      OrientDB::Document.create @db, class_name, hash
+      format_record OrientDB::Document.create @db, class_name, hash
     rescue => e
         if (e)
             raise parse_exception  e
@@ -122,14 +124,14 @@ module TSDatabase
     
     #\return boolean exception is false or exception if failed and exception is true
     def update hash, *option
-      create hash, *option
+      format_record create hash, *option
     end
     
     #\return boolean exception is false or exception if failed and exception is true
     def remove record_id, *option
       raise RecordIdError unless is_by_id?(record_id)
       
-      @db.delete(OrientDB::RID.new record_id)
+      format_record @db.delete(OrientDB::RID.new record_id)
     rescue => e
       if (option.empty? || option.last)
         raise parse_exception e
@@ -176,15 +178,19 @@ module TSDatabase
     end
     
     def format_record record
-      result = {}
-      if record.kind_of?(Java::ComOrientechnologiesOrientCoreRecordImpl::ODocument)
-        result["@type"]    = "d"
+      if enable_hash_record
+        result = {}
+        if record.kind_of?(Java::ComOrientechnologiesOrientCoreRecordImpl::ODocument)
+          result["@type"]    = "d"
+        end
+        result["@rid"]     = record.rid
+        result["@version"] = record.getVersion()
+        result["@class"]   = record.getClassName()
+        result.merge! format_field record 
+        result
+      else
+        record
       end
-      result["@rid"]     = record.rid
-      result["@version"] = record.getVersion()
-      result["@class"]   = record.getClassName()
-      result.merge! format_field record 
-      result
     end
     
     def format_field hash
@@ -248,7 +254,7 @@ module TSDatabase
     
     def quote value
         case value
-            when Numeric
+        when Numeric
             "'#{value}'"
         else
             @db.quote value
