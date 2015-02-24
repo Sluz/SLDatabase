@@ -144,7 +144,7 @@ module TSDatabase
             else
                 rid = duplicated.rid
             end
-            record = @db.find_by_rid(hash["@rid"])
+            record = @db.find_by_rid(rid)
             hash.each do |key, value|
                 key = key.to_s
                 unless key =~ /\A@/
