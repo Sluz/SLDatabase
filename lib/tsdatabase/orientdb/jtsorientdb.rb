@@ -3,6 +3,7 @@
 #
 
 require 'orientdb'
+require 'tsdatabase/orientdb'
 require 'tsdatabase/tsclientdb'
 
 #
