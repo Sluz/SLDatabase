@@ -8,7 +8,13 @@ module TSDatabase
   
   class RecordIdError < TSDatabaseError; end
   class RecordVersionError < TSDatabaseError; end
-  class RecordDuplicateError < TSDatabaseError; end
+  class RecordDuplicateError < TSDatabaseError; 
+      attr_accessor :rid
+      def initialize message, rid
+          super message
+          self.rid = rid
+      end
+  end
   class QueryError < TSDatabaseError; end
   class ConnectionError < TSDatabaseError; end
   

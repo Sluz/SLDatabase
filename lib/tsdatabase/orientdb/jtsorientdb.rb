@@ -125,8 +125,8 @@ module TSDatabase
         def update hash, *option
             exception = (option.empty? || option.last === true)
             format_record(create hash)
-        rescue Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException => duplicated
-            record = @db.find_by_rid(duplicated.getRid())
+        rescue RecordDuplicateError => duplicated
+            record = @db.find_by_rid(duplicated.rid)
             hash.each do |key, value|
                 key = key.to_s
                 unless key =~ /\A@/
@@ -251,7 +251,7 @@ module TSDatabase
             except = nil
             #Duplicate record
             if exception.kind_of?(Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException)
-                except = RecordDuplicateError.new exception.message
+                except = RecordDuplicateError.new exception.message, exception.getRid()
                 except.set_backtrace(exception.backtrace) 
       
                 #IO Database Connection
