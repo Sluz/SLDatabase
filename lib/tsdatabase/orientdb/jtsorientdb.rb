@@ -123,7 +123,23 @@ module TSDatabase
     
         #\return boolean exception is false or exception if failed and exception is true
         def update hash, *option
-            format_record(create hash, *option)
+            exception = (option.empty? || option.last === true)
+            format_record(create hash)
+        rescue Java::ComOrientechnologiesOrientCoreStorage::ORecordDuplicatedException => duplicated
+            record = @db.find_by_rid(duplicated.getRid())
+            hash.each do |key, value|
+                key = key.to_s
+                unless key =~ /\A@/
+                    record[key] = value
+                end
+            end
+            OrientDB::Document.create(@db, record.getClassName(), hash)
+        rescue => e
+            if exception
+                raise parse_exception  e
+            else
+                false
+            end
         end
     
         #\return boolean exception is false or exception if failed and exception is true
