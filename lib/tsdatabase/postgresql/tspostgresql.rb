@@ -13,12 +13,24 @@ module TSDatabase
     def initialize option={}
       @dbconfig = {}
       
-      unless option[:"host"].nil?
-        @dbconfig[:hostaddr] = option[:"host"]
+      unless option["host"].nil?
+        @dbconfig[:hostaddr] = option["host"]
       end
       
-      unless option[:database].nil?
-        @dbconfig[:dbname] = option[:database]
+      unless option["port"].nil?
+        @dbconfig[:port] = option["port"]
+      end
+      
+      unless option["username"].nil?
+        @dbconfig[:user] = option["username"]
+      end
+      
+      unless option["password"].nil?
+        @dbconfig[:password] = option["password"]
+      end
+      
+      unless option["database"].nil?
+        @dbconfig[:dbname] = option["database"]
       end
       
       # "postgresql://username:password@host:port/database"
@@ -98,9 +110,9 @@ module TSDatabase
       
       query = "SELECT * FROM #{ option.first } WHERE "
       hash.each do |key, value|
-        query << " #{key} = #{quote value},"
+        query << " #{key} = #{quote value} AND"
       end
-      query.gsub!(/,\z/, ";")
+      query.gsub!(/AND\z/, ";")
       
       find_by_query(query)
     end
