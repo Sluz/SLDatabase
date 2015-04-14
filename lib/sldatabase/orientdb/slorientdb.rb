@@ -26,13 +26,13 @@ module SLDatabase
             }
 
             if (option[:"url"].nil?)
-              if (option[:"port"].nil?)
-                @dbconfig[:url] = "remote:#{ option[:"host"] }/#{ option[:"database"] }"
-              else
-                @dbconfig[:url] = "remote:#{ option[:"host"] }:#{ option[:"port"] }/#{ option[:"database"] }"
-              end
+                if (option[:"port"].nil?)
+                  @dbconfig[:url] = "remote:#{ option[:"host"] }/#{ option[:"database"] }"
+                else
+                  @dbconfig[:url] = "remote:#{ option[:"host"] }:#{ option[:"port"] }/#{ option[:"database"] }"
+                end
             else
-              @dbconfig[:url] = option[:"url"]
+                @dbconfig[:url] = option[:"url"]
             end
 
             @db = JOrientdb::ODatabaseDocumentTx.new @dbconfig[:url]
@@ -49,8 +49,8 @@ module SLDatabase
             raise RecordIdError unless is_by_id?(record_id)
       
             find_by_query("select from #{record_id}").first
-        rescue =>e
-            nil
+        rescue => e
+          raise parse_exception e
         end
     
         # \return hash of records or nil
@@ -62,8 +62,8 @@ module SLDatabase
                 datas << find_by_query("select from #{record_id}").first
             end
             datas
-        rescue =>e
-            nil
+        rescue => e
+          raise parse_exception e
         end
 
         # \return a array whith hash of record
@@ -92,11 +92,15 @@ module SLDatabase
             end
       
             find_by_query("select * from #{from} where #{where}")
+        rescue => e
+          raise parse_exception e
         end
 
         # \return a array whith hash of record
         def find_by_query query, *option
             format_results @db.query(JOrientdb::OSQLSynchQuery.new(query), option)
+        rescue => e
+            raise parse_exception e
         end
 
         #\return boolean exception is false or exception if failed and exception is true
@@ -156,9 +160,9 @@ module SLDatabase
         #\return true if connection is alive
         def connected?
             if @client.nil?
-             false
+                false
             else
-              @client.isClosed()
+                @client.isClosed()
             end
         end
 
@@ -235,9 +239,7 @@ module SLDatabase
         def format_record record
             if enable_hash_record
                 result = {}
-#                if record.kind_of?(Java::ComOrientechnologiesOrientCoreRecordImpl::ODocument)
-#                    result["@type"]    = "d"
-#                end
+                result["@type"]    = record.field("@type").to_s[0]
                 result["@rid"]     = record.getIdentity().to_s
                 result["@version"] = record.getVersion()
                 result["@class"]   = record.getClassName()
