@@ -105,11 +105,11 @@ JSON
     SLDatabase.load_configuration('configuration_file_path', :production)
 
     #--- Get client pool
-    client = LDatabase::SLManager.get :jsonstore
+    client = SLDatabase::SLManager.get :database_name_for_sldatabase
     #--- Get Query
     datas = client.find_by_query "select * from Medias limit 2"
     #--- Free client pool
-    LDatabase::SLManager.push :jsonstore
+    SLDatabase::SLManager.push :database_name_for_sldatabase
 ```
 
 ## Version
