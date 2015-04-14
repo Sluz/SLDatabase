@@ -57,41 +57,41 @@ JSON
     {
         "production": [
             {
-                "adapter": "orientdb"
-                "host":" host_name"
-                "database": "database_name"
-                "username": "user_name"
-                "password": "password"
-                "port": 2424
+                "adapter": "orientdb",
+                "host": "host_name",
+                "database": "database_name",
+                "username": "user_name",
+                "password": "password",
+                "port": 2424,
                 "pool": 8
             },
             {
-                "adapter": "postgresql"
-                "host": "host_name"
-                "database": "database_name"
-                "username": "user_name"
-                "password": "password"
-                "port": 5432
+                "adapter": "postgresql",
+                "host": "host_name",
+                "database": "database_name",
+                "username": "user_name",
+                "password": "password",
+                "port": 5432,
                 "pool": 4
             }
         ]
         "development": {
             "database_name_for_sldatabase": {
-                "adapter": "orientdb"
-                "host":" host_name"
-                "database": "database_name"
-                "username": "user_name"
-                "password": "password"
-                "port": 2424
+                "adapter": "orientdb",
+                "host": "host_name",
+                "database": "database_name",
+                "username": "user_name",
+                "password": "password",
+                "port": 2424,
                 "pool": 1
             },
             "second_database_name_for_sldatabase": {
-                "adapter": "postgresql"
-                "host": "host_name"
-                "database": "database_name"
-                "username": "user_name"
-                "password": "password"
-                "port": 5432
+                "adapter": "postgresql",
+                "host": "host_name",
+                "database": "database_name",
+                "username": "user_name",
+                "password": "password",
+                "port": 5432,
                 "pool": 2
             }
         }
