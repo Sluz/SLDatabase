@@ -24,33 +24,33 @@ YML
             :database: database_name
             :username: user_name
             :password: password
-            :port: port_number
-            :pool: pool_number
+            :port: 2424
+            :pool: 5
         -
             :adapter: postgresql
             :host: host_name
             :database: database_name
             :username: user_name
             :password: password
-            :port: port_number
-            :pool: pool_number
-    :development
+            :port: 5432
+            :pool: 6
+    :development:
         :database_name_for_sldatabase:
             :adapter: orientdb
             :host: host_name
             :database: database_name
             :username: user_name
             :password: password
-            :port: port_number
-            :pool: pool_number
+            :port: 2424
+            :pool: 4
         :second_database_name_for_sldatabase:
             :adapter: orientdb
             :host: host_name
             :database: database_name
             :username: user_name
             :password: password
-            :port: port_number
-            :pool: pool_number
+            :port: 5432
+            :pool: 3
 ```
 JSON
 ```json
@@ -62,8 +62,8 @@ JSON
                 "database": "database_name"
                 "username": "user_name"
                 "password": "password"
-                "port": port_number
-                "pool": pool_number
+                "port": 2424
+                "pool": 8
             },
             {
                 "adapter": "postgresql"
@@ -71,8 +71,8 @@ JSON
                 "database": "database_name"
                 "username": "user_name"
                 "password": "password"
-                "port": port_number
-                "pool": pool_number
+                "port": 5432
+                "pool": 4
             }
         ]
         "development": {
@@ -82,8 +82,8 @@ JSON
                 "database": "database_name"
                 "username": "user_name"
                 "password": "password"
-                "port": port_number
-                "pool": pool_number
+                "port": 2424
+                "pool": 1
             },
             "second_database_name_for_sldatabase": {
                 "adapter": "postgresql"
@@ -91,8 +91,8 @@ JSON
                 "database": "database_name"
                 "username": "user_name"
                 "password": "password"
-                "port": port_number
-                "pool": pool_number
+                "port": 5432
+                "pool": 2
             }
         }
     }
