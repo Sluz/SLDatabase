@@ -31,6 +31,23 @@ module SLDatabase
             # => :KEEP_LOADED : don't disconnect client on push    
             def mode_keep_loaded; 200; end
       
+            alias_method :DEFAULT, :mode_default
+            alias_method :PRELOADED, :mode_preloaded
+            alias_method :KEEP_LOADED, :mode_keep_loaded 
+            
+            def open database = self.database_default
+              db.pop_connection database
+            end 
+            
+            def free database = self.database_default
+              db.push_connection database
+            end 
+            
+            alias_method :get,  :open
+            alias_method :pop,  :open
+            alias_method :push,  :free
+            alias_method :close, :free
+            
             alias_method :db, :instance
         end
     
@@ -48,11 +65,7 @@ module SLDatabase
             clt.connect
             clt
         end
-    
-        alias_method :get,  :pop_connection
-        alias_method :pop,  :pop_connection
-        alias_method :open, :pop_connection
-
+        
         def push_connection(database = self.class.database_default)
             connections = Thread.current[:tsclientdb][database]
             unless connections.nil?
@@ -63,10 +76,6 @@ module SLDatabase
                 clients[database].push connections
             end
         end
-    
-        alias_method :free,  :push_connection
-        alias_method :push,  :push_connection
-        alias_method :close, :push_connection
     
         # \brief close (push) all connection get(pop)
         def all_close
@@ -139,16 +148,6 @@ module SLDatabase
                     clt = SLPostgresql.new config
                 end
             when :orientdb
-#                if (RUBY_PLATFORM === "java")
-#                  require 'sldatabase/orientdb/jtsorientdb'
-#                  clt = JSLOrientdb.new config
-#                else
-#                  require 'sldatabase/orientdb/slorientdb'
-#                  clt = SLOrientdb.new config
-#                end
-#                require 'sldatabase/orientdb/slorientdbbinary'
-#                clt = SLOrientdbBinary.new config 
-
                 require 'sldatabase/orientdb/slorientdb'
                 clt = SLOrientdb.new config 
             else

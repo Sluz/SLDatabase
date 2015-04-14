@@ -40,7 +40,7 @@ module SLDatabase
   
   # Module function
   class << self 
-    def load_configuration filename_or_hash, mode="production"
+    def load_configuration filename_or_hash, mode=:production
         #--- Generate hash of server option
         if filename_or_hash.is_a? Hash
             SLDatabase::SLManager.instance.config_hash filename_or_hash, mode
@@ -64,14 +64,5 @@ module SLDatabase
             end
         end
     end
-    
-    def instance;    SLManager.instance;    end
-    def default;     SLManager.default;     end
-    def preloaded;   SLManager.preloaded;   end
-    def keep_loaded; SLManager.keep_loaded; end
-    alias_method :db, :instance
-    alias_method :DEFAULT, :default
-    alias_method :PRELOADED, :preloaded
-    alias_method :KEEP_LOADED, :keep_loaded 
   end
 end
