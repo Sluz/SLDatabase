@@ -74,7 +74,7 @@ JSON
                 "port": 5432,
                 "pool": 4
             }
-        ]
+        ],
         "development": {
             "database_name_for_sldatabase": {
                 "adapter": "orientdb",
