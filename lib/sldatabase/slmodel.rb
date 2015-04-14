@@ -1,5 +1,5 @@
 
-require 'tsdatabase' unless defined?( TSDatabase )
+require 'sldatabase' unless defined?( SLDatabase )
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
@@ -7,10 +7,10 @@ require 'tsdatabase' unless defined?( TSDatabase )
 # TODO 
 # - Thinking about dependency destroy like for a user model has_many :user_devices, :dependent => :destroy
 #
-module TSDatabase
-  class InvalidError< TSDatabaseError; end
+module SLDatabase
+  class InvalidError< SLDatabaseError; end
   
-  class TSModel
+  class SLModel
     class << self
       def hash_validates
         @validates ||={}
@@ -21,7 +21,7 @@ module TSDatabase
       end
 
       def database
-        @database ||= TSManager.database_default
+        @database ||= SLManager.database_default
       end
       
       def database= name
@@ -170,12 +170,12 @@ module TSDatabase
         end
         if (conn.nil?)
           is_from_thread = false
-          conn = TSManager.db.pop(database)
+          conn = SLManager.db.pop(database)
         end
         yield(conn)
       ensure
         unless is_from_thread
-          TSManager.db.push(database)
+          SLManager.db.push(database)
         end
       end
     end

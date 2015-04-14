@@ -1,18 +1,18 @@
-# TSDatabase
+# SLDatabase
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'tsdatabase', :git => 'git@universe.tapastreet.com:tapastreetgem/tsdatabase.git'
+    gem 'sldatabase', :git => 'https://github.com/Sluz/SLDatabase.git'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
-
-    $ gem install tsdatabase
+    # Currently not published
+    $ gem install sldatabase 
 
 ## Usage
 

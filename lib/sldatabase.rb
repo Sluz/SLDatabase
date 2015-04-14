@@ -1,13 +1,13 @@
 
-require "tsdatabase/version"
-require "tsdatabase/tsmanager"
+require "sldatabase/version"
+require "sldatabase/slmanager"
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 # 
-module TSDatabase
+module SLDatabase
   
-  class TSDatabaseError < StandardError 
+  class SLDatabaseError < StandardError 
     def initialize message_or_symbol
         if message_or_symbol.is_a? Symbol
             super message_for(message_or_symbol)
@@ -21,9 +21,9 @@ module TSDatabase
     end
     
   end 
-  class MissingAdapterError < TSDatabaseError; end
+  class MissingAdapterError < SLDatabaseError; end
   
-  class ConfigurationError < TSDatabaseError
+  class ConfigurationError < SLDatabaseError
       def message_for symbol
           case symbol
           when :multiple
@@ -43,7 +43,7 @@ module TSDatabase
     def load_configuration filename_or_hash, mode="production"
         #--- Generate hash of server option
         if filename_or_hash.is_a? Hash
-            TSDatabase::TSManager.instance.config_hash filename_or_hash, mode
+            SLDatabase::SLManager.instance.config_hash filename_or_hash, mode
         else
             if filename_or_hash.is_a? String 
                 extname = File.extname(filename_or_hash) 
@@ -53,9 +53,9 @@ module TSDatabase
             
             unless extname.nil?
                 if extname === ".json"
-                    TSDatabase::TSManager.instance.config_json filename_or_hash, mode
+                    SLDatabase::SLManager.instance.config_json filename_or_hash, mode
                 elsif extname === ".yml"
-                    TSDatabase::TSManager.instance.config_yml filename_or_hash, mode
+                    SLDatabase::SLManager.instance.config_yml filename_or_hash, mode
                 else
                     raise ConfigurationError.new :format
                 end
@@ -65,10 +65,10 @@ module TSDatabase
         end
     end
     
-    def instance;    TSManager.instance;    end
-    def default;     TSManager.default;     end
-    def preloaded;   TSManager.preloaded;   end
-    def keep_loaded; TSManager.keep_loaded; end
+    def instance;    SLManager.instance;    end
+    def default;     SLManager.default;     end
+    def preloaded;   SLManager.preloaded;   end
+    def keep_loaded; SLManager.keep_loaded; end
     alias_method :db, :instance
     alias_method :DEFAULT, :default
     alias_method :PRELOADED, :preloaded

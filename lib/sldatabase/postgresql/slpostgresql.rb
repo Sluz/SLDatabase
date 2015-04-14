@@ -1,14 +1,14 @@
 
-require 'tsdatabase' unless defined?( TSDatabase )
+require 'sldatabase' unless defined?( SLDatabase )
 require 'pg' unless defined?( PG )
-require 'tsdatabase/tsclientdb'
-require 'tsdatabase/postgresql'
+require 'sldatabase/slclientdb'
+require 'sldatabase/postgresql'
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
-module TSDatabase
-  class TSPostgresql < TSClientdb
+module SLDatabase
+  class SLPostgresql < SLClientdb
     
     def initialize option={}
       @dbconfig = {}

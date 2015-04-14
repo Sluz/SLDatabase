@@ -1,28 +1,28 @@
 
-require 'tsdatabase' unless defined?( TSDatabase )
+require 'sldatabase' unless defined?( SLDatabase )
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
-module TSDatabase
+module SLDatabase
   
-  class RecordIdError < TSDatabaseError; end
-  class RecordVersionError < TSDatabaseError; end
-  class RecordDuplicateError < TSDatabaseError; 
+  class RecordIdError < SLDatabaseError; end
+  class RecordVersionError < SLDatabaseError; end
+  class RecordDuplicateError < SLDatabaseError; 
       attr_accessor :rid
       def initialize message, rid
           super message
           self.rid = rid
       end
   end
-  class QueryError < TSDatabaseError; end
-  class ConnectionError < TSDatabaseError; end
+  class QueryError < SLDatabaseError; end
+  class ConnectionError < SLDatabaseError; end
   
   class TableError < QueryError; end
   class HashError < QueryError; end
   class HashEmptyError < QueryError; end
 
-  class TSClientdb
+  class SLClientdb
     
     attr_reader :db
     attr_reader :dbconfig
@@ -116,7 +116,7 @@ module TSDatabase
     end
     
     def parse_exception exception
-      except = TSDatabaseError.new exception.message
+      except = SLDatabaseError.new exception.message
       except.set_backtrace exception.backtrace
       except
     end

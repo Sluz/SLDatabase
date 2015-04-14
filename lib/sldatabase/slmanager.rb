@@ -7,14 +7,14 @@ require 'thread'
 #
 # Ruby:
 # :postgresql => gem 'pg', platform: :ruby
-# :orientdb   => gem 'orientdb4r', platform: :ruby
+# :orientdb   => gem 'jorientdb', platform: :ruby
 # 
 # JRuby:
 # :postgresql => gem 'jruby_pg', platform: :jruby  
-# :orientdb   => gem 'orientdb', platform: :jruby
+# :orientdb   => gem 'jorientdb', platform: :jruby
 #
-module TSDatabase
-    class TSManager
+module SLDatabase
+    class SLManager
         include Singleton
     
         attr_accessor :clients
@@ -132,22 +132,25 @@ module TSDatabase
             case config[:adapter].to_sym
             when :postgresql
                 if (RUBY_PLATFORM === "java")
-                    require 'tsdatabase/postgresql/jtspostgresql'
-                    clt = JTSPostgresql.new config
+                    require 'sldatabase/postgresql/jtspostgresql'
+                    clt = JSLPostgresql.new config
                 else
-                    require 'tsdatabase/postgresql/tspostgresql'
-                    clt = TSPostgresql.new config
+                    require 'sldatabase/postgresql/slpostgresql'
+                    clt = SLPostgresql.new config
                 end
             when :orientdb
-                if (RUBY_PLATFORM === "java")
-                  require 'tsdatabase/orientdb/jtsorientdb'
-                  clt = JTSOrientdb.new config
-                else
-                  require 'tsdatabase/orientdb/tsorientdb'
-                  clt = TSOrientdb.new config
-                end
-#                require 'tsdatabase/orientdb/tsorientdbbinary'
-#                clt = TSOrientdbBinary.new config 
+#                if (RUBY_PLATFORM === "java")
+#                  require 'sldatabase/orientdb/jtsorientdb'
+#                  clt = JSLOrientdb.new config
+#                else
+#                  require 'sldatabase/orientdb/slorientdb'
+#                  clt = SLOrientdb.new config
+#                end
+#                require 'sldatabase/orientdb/slorientdbbinary'
+#                clt = SLOrientdbBinary.new config 
+
+                require 'sldatabase/orientdb/slorientdb'
+                clt = SLOrientdb.new config 
             else
                 raise MissingAdapterError, "Adapter #{ config[:adapter] } are not supported"
             end

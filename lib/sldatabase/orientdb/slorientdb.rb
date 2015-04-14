@@ -2,14 +2,15 @@
 #  All right reserved
 #
 
-require 'orientdb4r'
-require 'tsdatabase/tsclientdb'
+require 'jorientdb'
+require 'sldatabase/slclientdb'
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
-module TSDatabase
-    class TSOrientdb < TSClientdb
+module SLDatabase
+    class SLOrientdb < SLClientdb
+        attr_accessor :enable_hash_record
 
         def initialize option={}
             @dbconfig = {
@@ -24,17 +25,18 @@ module TSDatabase
                 :ssl  => option[:"ssl"]
             }
 
-            #if (option["url"].nil?)
-            #  if (option["port"].nil?)
-            #    @dbconfig[:url] = "remote:#{ option["host"] }/#{ option["database"] }"
-            #  else
-            #    @dbconfig[:url] = "remote:#{ option["host"] }:#{ option["port"] }/#{ option["database"] }"
-            #  end
-            #else
-            #  @dbconfig[:url] = option["url"]
-            #end
+            if (option[:"url"].nil?)
+              if (option[:"port"].nil?)
+                @dbconfig[:url] = "remote:#{ option[:"host"] }/#{ option[:"database"] }"
+              else
+                @dbconfig[:url] = "remote:#{ option[:"host"] }:#{ option[:"port"] }/#{ option[:"database"] }"
+              end
+            else
+              @dbconfig[:url] = option[:"url"]
+            end
 
-            @db = Orientdb4r.client @server_config
+            @db = JOrientdb::ODatabaseDocumentTx.new @dbconfig[:url]
+            self.enable_hash_record = true
         end
 
         # \return true if query is a record_id
@@ -46,8 +48,7 @@ module TSDatabase
         def find_by_id record_id, *option
             raise RecordIdError unless is_by_id?(record_id)
       
-            connect
-            @db.get_document record_id
+            find_by_query("select from #{record_id}").first
         rescue =>e
             nil
         end
@@ -58,7 +59,7 @@ module TSDatabase
 
             datas = []
             record_ids.each do |current_id|
-                datas << @db.get_document(current_id)
+                datas << find_by_query("select from #{record_id}").first
             end
             datas
         rescue =>e
@@ -70,7 +71,6 @@ module TSDatabase
             raise HashError unless hash.is_a?(Hash)
             raise HashEmptyError if hash.empty?
       
-            connect
             where = ""
             from = ""
             hash.each do |key, value|
@@ -91,26 +91,24 @@ module TSDatabase
                 end
             end
       
-            @db.query("select * from #{from} where #{where}")
+            find_by_query("select * from #{from} where #{where}")
         end
 
         # \return a array whith hash of record
         def find_by_query query, *option
-            connect
-            if (option.empty?)
-                @db.query(query)
-            else
-                @db.query(query, option.first)
-            end
+            format_results @db.query(JOrientdb::OSQLSynchQuery.new(query), option)
         end
 
         #\return boolean exception is false or exception if failed and exception is true
         def create hash, *option
             raise HashError unless hash.is_a?(Hash)
             raise HashEmptyError if hash.empty?
-      
-            connect
-            @db.create_document(hash)
+            
+            document = @db.newInstance()
+            hash.each do |key, value|
+              document.field key.to_s, value
+            end
+            format_record document
         rescue => e
             if (option.empty? || option.last)
                 raise parse_exception e
@@ -121,12 +119,14 @@ module TSDatabase
 
         #\return boolean exception is false or exception if failed and exception is true
         def update hash, *option
-            raise HashError unless hash.is_a?(Hash)
+            raise HashError unless hash.is_a?(Hash) 
             raise HashEmptyError if hash.empty?
       
-            connect
-            hash.extend Orientdb4r::DocumentMetadata
-            @db.update_document(hash)
+            document = @db.newInstance()
+            hash.each do |key, value|
+              document.field key.to_s, value
+            end
+            @db.save(document, hashdelete("@class"))
         rescue => e
             if (option.empty? || option.last)
                 raise parse_exception e
@@ -138,9 +138,7 @@ module TSDatabase
         #\return boolean exception is false or exception if failed and exception is true
         def remove record_id, *option
             raise RecordIdError unless is_by_id?(record_id)
-
-            connect
-            @db.delete_document(record_id)
+            @db.delete(JOrientdb::ORecordId.new(record_id))
         rescue => e
             if (option.empty? || option.last)
                 raise parse_exception e
@@ -150,18 +148,22 @@ module TSDatabase
         end
 
         def connect
-            @db.connect(@dbconfig) unless connected?
-        rescue =>e
+            @client = @db.open(@dbconfig[:user], @dbconfig[:password]) unless connected?
+        rescue => e 
             raise parse_exception  e
         end
 
         #\return true if connection is alive
         def connected?
-            @db.connected?
+            if @client.nil?
+             false
+            else
+              @client.isClosed()
+            end
         end
 
         def disconnect
-            @db.disconnect unless @db.nil?
+            @db.close() unless @db.nil?
         end
 
         def quote value
@@ -220,6 +222,34 @@ module TSDatabase
             end
 
             except
+        end
+        
+        def format_results datas
+            result = []
+            for record in datas
+                result << format_record(record)
+            end
+            result
+        end
+        
+        def format_record record
+            if enable_hash_record
+                result = {}
+#                if record.kind_of?(Java::ComOrientechnologiesOrientCoreRecordImpl::ODocument)
+#                    result["@type"]    = "d"
+#                end
+                result["@rid"]     = record.getIdentity().to_s
+                result["@version"] = record.getVersion()
+                result["@class"]   = record.getClassName()
+            
+                #--- Extract fields
+                for key_value in record
+                  result[key_value.getKey().to_s] = key_value.getValue().to_ruby_value
+                end
+                result
+            else
+                record
+            end
         end
     end
 end
