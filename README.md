@@ -14,10 +14,9 @@ Or install it yourself as:
     # Currently not published
     $ gem install sldatabase 
 
-## Usage
-   
-    #--- Create Configuration file example:
-    ```yml
+## Configuration file example:
+YML
+```yml
     :production:
         -
             :adapter: orientdb
@@ -52,9 +51,9 @@ Or install it yourself as:
             :password: password
             :port: port_number
             :pool: pool_number
-    ```
-
-    ```json
+```
+JSON
+```json
     {
         "production": [
             {
@@ -97,9 +96,10 @@ Or install it yourself as:
             }
         }
     }
-    ```
+```
+## Usage
 
-    ```ruby
+```ruby
     require 'sldatabase'
     #--- Loading Configuration
     SLDatabase.load_configuration('configuration_file_path', :production)
@@ -110,8 +110,9 @@ Or install it yourself as:
     datas = client.find_by_query "select * from Medias limit 2"
     #--- Free client pool
     LDatabase::SLManager.push :jsonstore
+```
 
 ## Version
  It is prototype (or alpha) version.
-    ```
+
 
