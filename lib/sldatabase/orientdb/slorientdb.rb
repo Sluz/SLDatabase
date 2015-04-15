@@ -3,6 +3,7 @@
 #
 
 require 'jorientdb'
+require 'multi_json'
 require 'sldatabase/slclientdb'
 
 #
@@ -10,7 +11,7 @@ require 'sldatabase/slclientdb'
 #
 module SLDatabase
     class SLOrientdb < SLClientdb
-        attr_accessor :enable_hash_record
+        attr_accessor :format
 
         def initialize option={}
             @dbconfig = {
@@ -21,8 +22,7 @@ module SLDatabase
 
             @server_config = {
                 :host => option[:"host"],
-                :port => option[:"port"],
-                :ssl  => option[:"ssl"]
+                :port => option[:"port"]
             }
 
             if (option[:"url"].nil?)
@@ -34,9 +34,9 @@ module SLDatabase
             else
                 @dbconfig[:url] = option[:"url"]
             end
-
+#JOrientdb::OPartitionedDatabasePool.new @dbconfig[:url], @dbconfig[:username], @dbconfig[:password], option[:pool]
             @db = JOrientdb::ODatabaseDocumentTx.new @dbconfig[:url]
-            self.enable_hash_record = true
+            self.format = :json_ruby_sym
         end
 
         # \return true if query is a record_id
@@ -98,7 +98,13 @@ module SLDatabase
 
         # \return a array whith hash of record
         def find_by_query query, *option
-            format_results @db.query(JOrientdb::OSQLSynchQuery.new(query), option)
+            limit = 100
+            query.gsub! /(limit|LIMIT)\s+(\d+)/ do 
+              limit = $2.to_i
+              ''
+            end
+            
+            format_results @db.query(JOrientdb::OSQLSynchQuery.new(query, limit), option)
         rescue => e
             raise parse_exception e
         end
@@ -237,7 +243,7 @@ module SLDatabase
         end
         
         def format_record record
-            if enable_hash_record
+            if format == :ruby
                 result = {}
                 result["@type"]    = record.field("@type").to_s[0]
                 result["@rid"]     = record.getIdentity().to_s
@@ -249,7 +255,13 @@ module SLDatabase
                   result[key_value.getKey().to_s] = key_value.getValue().to_ruby_value
                 end
                 result
-            else
+            elsif format == :json_ruby
+                MultiJson.load(record.toJSON())
+            elsif format == :json_ruby_sym
+                MultiJson.load(record.toJSON(), :symbolize_keys => true)
+            elsif format == :json
+                record.toJSON()
+            elsif format == :none
                 record
             end
         end
