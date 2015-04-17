@@ -1,7 +1,6 @@
 
-require 'sldatabase' unless defined?( SLDatabase )
-require 'pg_jruby'
-require 'sldatabase/slposgresql'
+require 'pg_jruby' if RUBY_PLATFORM =~ /java/
+require 'sldatabase/postgresql/slposgresql'
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>

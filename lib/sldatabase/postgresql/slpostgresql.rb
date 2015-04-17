@@ -1,74 +1,14 @@
 
-require 'sldatabase' unless defined?( SLDatabase )
-require 'pg' unless defined?( PG )
+require 'pg' unless defined?( PG ) && RUBY_PLATFORM =~ /java/
 require 'sldatabase/slclientdb'
-require 'sldatabase/postgresql'
 
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 #
 module SLDatabase
-  class SLPostgresql < SLClientdb
-    
-    def initialize option={}
-      @dbconfig = {}
-      
-      unless option["host"].nil?
-        @dbconfig[:hostaddr] = option["host"]
-      end
-      
-      unless option["port"].nil?
-        @dbconfig[:port] = option["port"]
-      end
-      
-      unless option["username"].nil?
-        @dbconfig[:user] = option["username"]
-      end
-      
-      unless option["password"].nil?
-        @dbconfig[:password] = option["password"]
-      end
-      
-      unless option["database"].nil?
-        @dbconfig[:dbname] = option["database"]
-      end
-      
-      # "postgresql://username:password@host:port/database"
-      unless (option[:"url"].nil?)
-        url = option[:"url"].gsub(/\Apostgresql:\/\//, "")
-        url.gsub(/[\w:@\.\-]+/) do |config|
-          
-          config.gsub(/\A[\w:]+@/) do |user_pass|
-            user_pass.gsub(/:[\w\-\.]+/) do |pass|
-              @dbconfig[:password] = pass
-              pass = ""
-            end
-            
-            user_pass.gsub(/[\w\-\.]+/) do |user|
-              @dbconfig[:user] = user
-              user = ""
-            end
-            ""
-          end
-          
-          config.gsub(/\A[\w\.]+/) do |host|
-            @dbconfig[:hostaddr] = host
-            host = ""
-          end
-          
-          config.gsub(/\d+/) do |port|
-            @dbconfig[:port] = port
-            port = ""
-          end
-        end
-        
-        url.gsub(/\w+/) do |match|
-          @dbconfig[:dbname] = match
-        end
-      end
-      #[host port options tty dbname user password]
-    end
-    
+  class SLPostgresql
+    include SLClientdb
+
     def is_table? *option
       if option.empty? || option.first.is_a?(String) == false
         false
@@ -120,12 +60,14 @@ module SLDatabase
     # \return a array whith hash of record
     def find_by_query query, *option
       if (option.empty?)
-        @db.exec query
+        db.exec query
       elsif option[0].is_a?(Array)
-        @db.exec_params query, *option
+        db.exec_params query, *option
       else
-        @db.exec_params query, *option
+        db.exec_params query, *option
       end
+    rescue => e
+      raise parse_exception e
     end
     
     #\return boolean exception is false or exception if failed and exception is true
@@ -190,21 +132,17 @@ module SLDatabase
       end
     end
     
-    def connect
-      unless (connected?)
-        @db = PG.connect @dbconfig
-      end
-    rescue =>e
-      raise parse_exception  e
-    end
-    
     #\return true if connection is alive
     def connected?
-      !@db.finished?
+      if db.nil?
+        false
+      else
+        !db.finished?
+      end
     end
-
+    
     def disconnect
-      @db.close unless @db.nil?
+      db.close unless db.nil? || db.finished?
     end
     
     def parse_exception exception
@@ -215,12 +153,12 @@ module SLDatabase
         except = RecordDuplicateError.new exception.message
         except.set_backtrace(exception.backtrace)
         
-      #IO Database Connection
+        #IO Database Connection
       elsif  false
         except = ConnectionError.new exception.message
         except.set_backtrace(exception.backtrace)
         
-      #default
+        #default
       else 
         except = super exception
       end

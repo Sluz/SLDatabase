@@ -123,14 +123,14 @@ module SLDatabase
         end
       end
       if (error.nil?)
-         self.class.query_block do |conn|
-           id = conn.parse_id_from datas
-           if (id.nil?)
-             conn.create( datas.merge( {"@class"=>self.class.name.downcase} ) )
-           else
-             conn.update( datas.merge( {"@class"=>self.class.name.downcase} ) )
-           end
-         end
+        self.class.query_block do |conn|
+          id = conn.parse_id_from datas
+          if (id.nil?)
+            conn.create( datas.merge( {"@class"=>self.class.name.downcase} ) )
+          else
+            conn.update( datas.merge( {"@class"=>self.class.name.downcase} ) )
+          end
+        end
       else
         self.errors = error
         nil

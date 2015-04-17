@@ -9,11 +9,11 @@ module SLDatabase
   class RecordIdError < SLDatabaseError; end
   class RecordVersionError < SLDatabaseError; end
   class RecordDuplicateError < SLDatabaseError; 
-      attr_accessor :rid
-      def initialize message, rid
-          super message
-          self.rid = rid
-      end
+    attr_accessor :rid
+    def initialize message, rid
+      super message
+      self.rid = rid
+    end
   end
   class QueryError < SLDatabaseError; end
   class ConnectionError < SLDatabaseError; end
@@ -22,13 +22,38 @@ module SLDatabase
   class HashError < QueryError; end
   class HashEmptyError < QueryError; end
 
-  class SLClientdb
+  class SLConfiguration
+    include Singleton
+    attr_accessor :configuration
     
-    attr_reader :db
-    attr_reader :dbconfig
+    def initialize
+      self.configuration = {}
+    end
     
-    def initialize option={}
-      raise NotImplementedError, 'this should be overridden by concrete client'
+    def self.configuration
+      self.instance.configuration
+    end
+    
+  end
+  
+  module SLClientdb
+    attr_accessor :db
+    attr_accessor :format # => [:ruby, :json_ruby, :json_ruby_sym, :json, :none]
+    
+    def initialize db, format
+      self.db     = db
+      self.format = (format || :ruby)
+    end
+    
+    def available_format
+      [:ruby, :json_ruby, :json_ruby_sym, :json, :none]
+    end
+    
+    def format= new_format
+      unless new_format.is_a?(Symbol) && available_format.include?(new_format)
+        raise StandardError.new "format should be #{available_format}"
+      end
+      @format = new_format
     end
     
     def parse_id_from hash
@@ -102,17 +127,23 @@ module SLDatabase
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
     
-    def connect
-      raise NotImplementedError, 'this should be overridden by concrete client'
-    end
-    
     #\return true if connection is alive
     def connected?
       raise NotImplementedError, 'this should be overridden by concrete client'
     end
-
+    
+    def connect
+      unless connected?  
+        self.db = SLConfiguration.configuration[configuration_key].acquire
+      end
+    rescue => e 
+      raise parse_exception  e
+    end
+    
     def disconnect
-      raise NotImplementedError, 'this should be overridden by concrete client'
+      SLConfiguration.configuration[configuration_key].close() if connected?
+    rescue => e 
+      raise parse_exception  e
     end
     
     def parse_exception exception

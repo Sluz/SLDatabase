@@ -5,64 +5,66 @@ require "sldatabase/slmanager"
 #
 # \author Cyril Bourgès <cyril@tapastreet.com>
 # 
+# Ruby:
+# :postgresql => gem 'pg', platform: :ruby
+# :orientdb   => gem 'jorientdb', platform: :ruby
+# 
+# JRuby:
+# :postgresql => gem 'jruby_pg', platform: :jruby  
+# :orientdb   => gem 'jorientdb', platform: :jruby
+#
 module SLDatabase
-  
   class SLDatabaseError < StandardError 
     def initialize message_or_symbol
-        if message_or_symbol.is_a? Symbol
-            super message_for(message_or_symbol)
-        else
-            super message_or_symbol
-        end
+      if message_or_symbol.is_a? Symbol
+        super message_for(message_or_symbol)
+      else
+        super message_or_symbol
+      end
     end
     
     def message_for symbol
-        "Undefined #{symbol} error"
+      "Undefined #{symbol} error"
     end
     
   end 
   class MissingAdapterError < SLDatabaseError; end
   
   class ConfigurationError < SLDatabaseError
-      def message_for symbol
-          case symbol
-          when :multiple
-              "Multiple configuration"
-          when :file
-              "Incompatible file is not a File or Path"
-          when :format
-              "Incompatible format require file extention .json or .yml"
-          else
-              super symbol
-          end
+    def message_for symbol
+      case symbol
+      when :multiple
+        "Multiple configuration"
+      when :file
+        "Incompatible file is not a File or Path"
+      when :format
+        "Incompatible format require file extention .json or .yml"
+      else
+        super symbol
       end
+    end
   end
   
-  # Module function
   class << self 
-    def load_configuration filename_or_hash, mode=:production
-        #--- Generate hash of server option
-        if filename_or_hash.is_a? Hash
-            SLDatabase::SLManager.instance.config_hash filename_or_hash, mode
-        else
-            if filename_or_hash.is_a? String 
-                extname = File.extname(filename_or_hash) 
-            elsif filename_or_hash.is_a? File 
-                extname = File.extname(filename_or_hash.path) 
-            end
-            
-            unless extname.nil?
-                if extname === ".json"
-                    SLDatabase::SLManager.instance.config_json filename_or_hash, mode
-                elsif extname === ".yml"
-                    SLDatabase::SLManager.instance.config_yml filename_or_hash, mode
-                else
-                    raise ConfigurationError.new :format
-                end
-            else
-                raise ConfigurationError.new :file
-            end
-        end
+    def db 
+      SLDatabase::SLManager.instance
     end
+    
+    def load_configuration filename_or_hash, mode=:production
+      db.load_configuration filename_or_hash, mode
+    end
+    
+    def open database = db.database_default
+      db.pop_connection database
+    end 
+
+    def free database = db.database_default
+      db.push_connection database
+    end 
+            
+    alias_method :get,  :open
+    alias_method :pop,  :open
+    alias_method :push,  :free
+    alias_method :close, :free
   end
 end
