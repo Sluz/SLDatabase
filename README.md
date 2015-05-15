@@ -1,5 +1,6 @@
 # SLDatabase
 [![Dependency Status](https://gemnasium.com/Sluz/SLDatabase.svg)](https://gemnasium.com/Sluz/SLDatabase)
+[![Code Climate](https://codeclimate.com/github/Sluz/SLDatabase/badges/gpa.svg)](https://codeclimate.com/github/Sluz/SLDatabase)
 ## Installation
 
 Add this line to your application's Gemfile:
