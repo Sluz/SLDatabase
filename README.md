@@ -1,5 +1,5 @@
 # SLDatabase
-
+[![Dependency Status](https://gemnasium.com/Sluz/SLDatabase.svg)](https://gemnasium.com/Sluz/SLDatabase)
 ## Installation
 
 Add this line to your application's Gemfile:
